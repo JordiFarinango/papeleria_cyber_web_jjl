@@ -1,1 +1,1 @@
-# papeleria_cyber_web_jjl
+pegar el sistema en una carpeta llamada "Proyecto_papeleria"
