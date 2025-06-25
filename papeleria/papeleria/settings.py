@@ -144,5 +144,22 @@ if DEBUG: #es para verificar los correos
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 
-ACCOUNT_AUTHENTICATION_METHOD = 'username'
+
+#este es para que cuando el usuario inicie sesión, le redirija a la pagina que le digamos
+ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS = True 
+LOGIN_REDIRECT_URL = 'inicio_admin'
+
+#este es para que cuando se vaya a logear, utilice el correo o usuario.
+ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
 ACCOUNT_EMAIL_REQUIRED = True
+
+#para que no existan usuarios con el mismo correo
+ACCOUNT_UNIQUE_EMAIL = True
+
+#para que los usuarios tengan que verificar su correo
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+
+#los dias que se expira la verificacion
+ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 7
+
+ACCOUNT_LOGOUT_REDIRECT_URL = 'inicio'
