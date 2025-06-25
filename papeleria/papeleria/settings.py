@@ -140,7 +140,9 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-if DEBUG:
+if DEBUG: #es para verificar los correos
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 
+ACCOUNT_AUTHENTICATION_METHOD = 'username'
+ACCOUNT_EMAIL_REQUIRED = True

@@ -1,0 +1,28 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Navbar</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+  />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
+  </style>
+</head>
+<body class="bg-[#181c21] font-sans">
+  <nav class="flex items-center justify-between px-6 py-3 max-w-full">
+    <div class="flex items-center space-x-4">
+      <div class="flex items-center justify-center w-8 h-8 rounded border border-gray-600 text-white font-bold text-lg font-mono select-none">
+        V
+      </div>
+    </div>
+    <div class="flex items-center space-x-3">
+        <a href="{% url 'account_login' %}" class="text-white border border-gray-600 rounded px-3 py-1 text-sm hover:bg-gray-700 transition">Ingresar</a>
+        <a href="{% url 'account_signup' %}" class="bg-yellow-500 hover:bg-yellow-600 text-black rounded px-4 py-1 text-sm font-semibold transition">Registrarse</a>
+    </div>
+  </nav>
+</body>
+</html>
