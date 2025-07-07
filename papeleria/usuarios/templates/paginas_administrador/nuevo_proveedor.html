@@ -1,0 +1,18 @@
+{% extends 'barra_navegacion/barra.html' %}
+
+{% block title %}Nuevo Proveedor{% endblock %}
+
+{% block content %}
+
+<h1>Nuevo Proveedor</h1>
+
+<form method="POST">
+    {% csrf_token %}
+    <input type="text" name="nombre" placeholder="Nombre" required>
+    <input type="text" name="celular" placeholder="Celular" required>
+    <input type="text" name="cedula" placeholder="Cédula" required>
+    <textarea rows="3" name="direccion" placeholder="Dirección" required></textarea>
+    <button type="submit">Guardar</button>
+</form>
+
+{% endblock %}

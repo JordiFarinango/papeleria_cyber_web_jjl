@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+{% load static %}
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -39,17 +40,35 @@
           <span>Facturar</span>
         </a>
 
-        <div class="uppercase text-xs font-semibold mb-3 select-none">Inventario</div>
-        <a href="{% url 'productos_admin'%}" class="flex items-center space-x-3 py-2 rounded hover:bg-gray-100">
-          <i class="fas fa-bug"></i>
-          <span>Productos</span>
-        </a>
-        <div class="uppercase text-xs font-semibold mb-3 select-none">Usuarios</div>
-        <a href="{% url 'usuarios_admin'%}" class="flex items-center space-x-3 py-2 rounded hover:bg-gray-100">
-          <i class="fa-solid fa-user"></i>
-          <span>Usuarios</span>
-        </a>
-        
+
+      <div class="uppercase text-xs font-semibold mb-3 select-none">INVENTARIO</div>
+      <div id="btn-productos" class="flex items-center space-x-3 py-2 rounded hover:bg-gray-100 cursor-pointer">
+        <i class="fas fa-box"></i>
+        <span>Productos</span>
+        <i class="fas fa-chevron-down ml-auto text-sm"></i>
+      </div>
+
+      <div id="submenu-productos" class="ml-6 mt-1 space-y-1 hidden">
+      <a href="{% url 'nuevo_producto_admin' %}" class="block py-1 text-sm hover:underline">Agregar Nuevo Producto</a>
+      <a href="{% url 'ver_productos_admin'%}" class="block py-1 text-sm hover:underline">Ver Productos</a>
+      <a href="{% url 'ingresar_inventario_admin' %}" class="block py-1 text-sm hover:underline">Ingresar Inventario</a>
+      <a href="{% url 'marcas_admin' %}" class="block py-1 text-sm hover:underline">Marcas</a>
+      <a href="{% url 'categorias_admin' %}" class="block py-1 text-sm hover:underline">Categorías</a>
+      </div>
+
+
+      <div class="uppercase text-xs font-semibold mb-3 select-none">USUARIOS</div>
+      <div id="btn-usuarios" class="flex items-center space-x-3 py-2 rounded hover:bg-gray-100 cursor-pointer">
+        <i class="fas fa-box"></i>
+        <span>Asociados</span>
+        <i class="fas fa-chevron-down ml-auto text-sm"></i>
+      </div>
+
+      <div id="submenu-usuarios" class="ml-6 mt-1 space-y-1 hidden">
+      <a href="{% url 'nuevo_proveedor_admin' %}" class="block py-1 text-sm hover:underline">Proveedores</a>
+      </div>
+
+
         <hr class="my-4 border-t border-black opacity-60"/>
 
         <a href="{% url 'account_logout' %}" >
@@ -64,5 +83,6 @@
       {% endblock %}
     </main>
   </div>
+<script src="{% static 'assets/js/funciones.js' %}"></script>
 </body>
 </html>

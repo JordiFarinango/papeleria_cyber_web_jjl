@@ -1,0 +1,16 @@
+{% extends 'barra_navegacion/barra.html' %}
+
+{% block title %} Categorías {% endblock %}
+
+{% block content %}
+<a>CATEGORIAS</a>
+
+<form method="POST">
+    {% csrf_token %}
+    <input type="text" name="nombre" placeholder="Categoria uwu" required>
+    <button type="submit">Guardar</button>
+
+</form>
+
+
+{% endblock %}

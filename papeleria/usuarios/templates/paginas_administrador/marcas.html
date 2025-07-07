@@ -1,0 +1,13 @@
+{% extends 'barra_navegacion/barra.html' %}
+
+{% block title %} Marcas {% endblock %}
+
+{% block content %}
+<a>Registrar nueva marca</a>
+
+<form method="POST">
+{% csrf_token %}
+<input type="text" name="nombre" placeholder="Nombre de la marca" required>
+<button type="submit">Guardar</button>
+</form>
+{% endblock %}
