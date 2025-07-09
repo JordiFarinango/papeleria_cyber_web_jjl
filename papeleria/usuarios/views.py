@@ -1,6 +1,6 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.forms import UserCreationForm
-from .models import Marca, Categoria, Proveedor
+from .models import Marca, Categoria, Proveedor, Producto
 
 #pagina antes del login
 def inicio(request):
@@ -11,13 +11,38 @@ def inicio_admin(request):
     return render(request, 'paginas_administrador/inicio_admin.html')
 
 def nuevo_producto_admin(request):
-    return render(request, 'paginas_administrador/nuevo_producto.html')
+    marcas = Marca.objects.all()
+    categorias = Categoria.objects.all()
+
+    if request.method == 'POST':
+        nombre = request.POST.get('nombre')
+        descripcion = request.POST.get('descripcion')
+        stock = request.POST.get('stock')
+        precio = request.POST.get('precio')
+        categoria_id = request.POST.get('categoria')
+        marca_id = request.POST.get('marca')
+
+        marca = get_object_or_404(Marca, id=marca_id)
+        categoria = get_object_or_404(Categoria, id=categoria_id)
+
+        if nombre:
+            guardar_producto = Producto(nombre=nombre, descripcion=descripcion, stock=stock, precio=precio, categoria=categoria, marca=marca)
+            guardar_producto.save()
+            return redirect('nuevo_producto_admin')
+        
+    return render(request, 'paginas_administrador/agregar/nuevo_producto.html', {
+        'marcas_diccionario': marcas,
+        'categorias_diccionario': categorias,
+    })
 
 def ver_productos_admin(request):
-    return render(request, 'paginas_administrador/ver_productos.html')
+    productos = Producto.objects.all()
+    return render(request, 'paginas_administrador/ver/ver_productos.html',{
+        'productos': productos
+    })
 
 def ingresar_inventario_admin(request):
-    return render(request, 'paginas_administrador/ingresar_inventario.html')
+    return render(request, 'paginas_administrador/agregar/ingresar_inventario.html')
 
 def marcas_admin(request):
     if request.method == 'POST': #si dio clic en guardar
@@ -27,7 +52,7 @@ def marcas_admin(request):
             nueva_marca = Marca(nombre=nombre) #quiero crear una nueva marca con este nombre (primer 'nombre' es del modelo Marca de models, y el segundo 'nombre' es de la variable creada arriba)
             nueva_marca.save() #se guarda la marca en la base de datos
             return redirect('marcas_admin') #cuando se guarde, redirigimos al usuarios a marcas.html
-    return render(request, 'paginas_administrador/marcas.html')
+    return render(request, 'paginas_administrador/agregar/marcas.html')
 
 def categorias_admin(request):
     if request.method == 'POST':
@@ -37,7 +62,7 @@ def categorias_admin(request):
             nueva_categoria = Categoria(nombre=nombre)
             nueva_categoria.save()
             return redirect('categorias_admin')
-    return render(request, 'paginas_administrador/categorias.html')
+    return render(request, 'paginas_administrador/agregar/categorias.html')
 
 def nuevo_proveedor_admin(request):
     if request.method == 'POST':
@@ -50,12 +75,7 @@ def nuevo_proveedor_admin(request):
             nuevo_proveedor = Proveedor(nombre=nombre, celular=celular, ruc_cedula=cedula, direccion=direccion)
             nuevo_proveedor.save()
             return redirect('nuevo_proveedor_admin')
-
-
-    return render (request, 'paginas_administrador/nuevo_proveedor.html')
-
-
-
+    return render (request, 'paginas_administrador/agregar/nuevo_proveedor.html')
 
 
 
@@ -63,5 +83,5 @@ def facturar_admin(request):
     return render(request, 'paginas_administrador/facturar.html')
 
 def usuarios_admin(request):
-    return render(request, 'paginas_administrador/usuarios.html')
+    return render(request, 'paginas_administrador/agregar/usuarios.html')
 
