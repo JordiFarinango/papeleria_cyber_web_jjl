@@ -31,3 +31,14 @@ class Producto(models.Model):
 
     def __str__(self):
         return f"{self.nombre} - {self.marca}"
+
+class Cliente(models.Model):
+    nombre = models.CharField(max_length=200)
+    ruc_cedula = models.CharField(max_length=100, unique=True)
+    celular = models.CharField(max_length=100)
+    direccion = models.TextField(blank=True)
+    correo = models.EmailField(blank=True)
+    provincia = models.CharField(max_length=200)
+
+    def __str__(self):
+        return f"{self.nombre} - {self.ruc_cedula}"

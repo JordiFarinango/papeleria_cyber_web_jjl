@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.forms import UserCreationForm
-from .models import Marca, Categoria, Proveedor, Producto
+from django.contrib import messages
+from .models import Marca, Categoria, Proveedor, Producto, Cliente
 
 #pagina antes del login
 def inicio(request):
@@ -77,10 +78,36 @@ def nuevo_proveedor_admin(request):
             return redirect('nuevo_proveedor_admin')
     return render (request, 'paginas_administrador/agregar/nuevo_proveedor.html')
 
+def nuevo_cliente_admin(request):
+    clientes = Cliente.objects.all()
 
+    if request.method == 'POST':
+        nombre = request.POST.get('nombre')
+        cedula = request.POST.get('cedula')
+        celular = request.POST.get('celular')
+        direccion = request.POST.get('direccion')
+        correo = request.POST.get('correo')
+        provincia = request.POST.get('provincia')
 
+        if Cliente.objects.filter(ruc_cedula=cedula).exists():
+            messages.error(request, "Esta cédula ya existe.")
+            return redirect('nuevo_cliente_admin')
+
+        if nombre:
+            nuevo_cliente = Cliente(nombre=nombre, ruc_cedula=cedula, direccion=direccion, correo=correo, celular=celular, provincia=provincia)
+            nuevo_cliente.save()
+            return redirect('nuevo_cliente_admin')
+        
+    return render(request, 'paginas_administrador/agregar/nuevo_cliente.html',{
+        'clientes_diccionario': clientes
+    })
+    
+
+    
 def facturar_admin(request):
     return render(request, 'paginas_administrador/facturar.html')
+
+
 
 def usuarios_admin(request):
     return render(request, 'paginas_administrador/agregar/usuarios.html')

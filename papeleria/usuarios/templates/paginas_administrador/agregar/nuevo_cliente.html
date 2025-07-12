@@ -1,0 +1,53 @@
+{% extends 'barra_navegacion/barra.html' %}
+
+{% block title %} Clientes {% endblock %}
+
+{%  block content %}
+<form method="POST">
+    {% csrf_token %}
+    <input type="text" name="nombre" placeholder="Nombre" required>
+    <input type="text" name="cedula" placeholder="Cédula o RUC">
+    <input type="text" name="celular" placeholder="Celular">
+    <textarea name="direccion" rows="3" placeholder="Direccion"></textarea>
+    <input type="email" name="correo" placeholder="Correo">
+    <input type="text" name="provincia" placeholder="Provincia">
+    <button type="submit">Guardar Cliente</button>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Cédula</th>
+                <th>Celular</th>
+                <th>Dirección</th>
+                <th>Correo</th>
+                <th>Provincia</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for cliente in clientes_diccionario %}
+            <tr>
+                <td>{{ cliente.nombre }}</td>
+                <td>{{ cliente.ruc_cedula }}</td>
+                <td>{{ cliente.celular }}</td>
+                <td>{{ cliente.direccion }}</td>
+                <td>{{ cliente.correo }}</td>
+                <td>{{ cliente.provincia }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6">No hay clientes registrados</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+            {% if messages %}
+                <ul>
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+            {% endif %}
+</form>
+{% endblock %}
