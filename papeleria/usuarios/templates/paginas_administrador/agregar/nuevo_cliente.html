@@ -2,52 +2,103 @@
 
 {% block title %} Clientes {% endblock %}
 
-{%  block content %}
+{% block content %}
+
 <form method="POST">
-    {% csrf_token %}
-    <input type="text" name="nombre" placeholder="Nombre" required>
-    <input type="text" name="cedula" placeholder="Cédula o RUC">
-    <input type="text" name="celular" placeholder="Celular">
-    <textarea name="direccion" rows="3" placeholder="Direccion"></textarea>
-    <input type="email" name="correo" placeholder="Correo">
-    <input type="text" name="provincia" placeholder="Provincia">
-    <button type="submit">Guardar Cliente</button>
+  {% csrf_token %}
+  <div class="text-2xl font-semibold text-gray-800 mb-4">
+    <h2>Agregar Nuevo Cliente</h2>
+  </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Cédula</th>
-                <th>Celular</th>
-                <th>Dirección</th>
-                <th>Correo</th>
-                <th>Provincia</th>
-            </tr>
-        </thead>
+<div class="max-w-3xl grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+    
+  <label class="flex flex-col text-xs font-sans text-gray-500">
+    <span class="mb-1 font-semibold tracking-wide">Nombre</span>
+    <input type="text" name="nombre" required class="border border-gray-300 rounded-md py-1 px-3 text-sm font-sans text-gray-900 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+  </label>
 
-        <tbody>
-            {% for cliente in clientes_diccionario %}
-            <tr>
-                <td>{{ cliente.nombre }}</td>
-                <td>{{ cliente.ruc_cedula }}</td>
-                <td>{{ cliente.celular }}</td>
-                <td>{{ cliente.direccion }}</td>
-                <td>{{ cliente.correo }}</td>
-                <td>{{ cliente.provincia }}</td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="6">No hay clientes registrados</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-            {% if messages %}
-                <ul>
-            {% for message in messages %}
-                <li>{{ message }}</li>
-            {% endfor %}
-        </ul>
-            {% endif %}
+  <label class="flex flex-col text-xs font-sans text-gray-500">
+    <span class="mb-1 font-semibold tracking-wide">Cédula o RUC</span>
+    <input type="text" name="cedula" class="w-40 border border-gray-300 rounded-md py-1 px-3 text-sm font-sans text-gray-900 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+  </label>
+
+  <label class="flex flex-col text-xs font-sans text-gray-500">
+    <span class="mb-1 font-semibold tracking-wide">Celular</span>
+    <input type="text" name="celular" class="w-40 border border-gray-300 rounded-md py-1 px-3 text-sm font-sans text-gray-900 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+  </label>
+
+  <label class="flex flex-col text-xs font-sans text-gray-500 md:col-span-2">
+    <span class="mb-1 font-semibold tracking-wide">Dirección</span>
+    <textarea name="direccion" rows="2" class="border border-gray-300 rounded-md py-1 px-3 text-sm font-sans text-gray-900 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"></textarea>
+  </label>
+
+  <label class="flex flex-col text-xs font-sans text-gray-500">
+    <span class="mb-1 font-semibold tracking-wide">Correo</span>
+    <input type="email" name="correo" class="border border-gray-300 rounded-md py-1 px-3 text-sm font-sans text-gray-900 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+  </label>
+
+  <label class="flex flex-col text-xs font-sans text-gray-500">
+    <span class="mb-1 font-semibold tracking-wide">Provincia</span>
+    <input type="text" name="provincia" class="border border-gray-300 rounded-md py-1 px-3 text-sm font-sans text-gray-900 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+  </label>
+
+  <div class="md:col-span-2 flex  mt-4">
+    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-1 px-6 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"> Guardar Cliente </button>
+  </div>
+</div>
+
+
 </form>
+
+<div class="text-2xl font-semibold text-gray-800 mb-4">
+    <h2>Clientes Registrados</h2>
+</div>
+
+<!-- Tabla de clientes bonitamente estilizada -->
+<div class="overflow-x-auto mt-8">
+  <div class="bg-white rounded-2xl shadow-md p-4">
+    <table class="min-w-full border-separate border-spacing-x-2 border-spacing-y-2 text-sm text-left text-gray-700">
+      <thead>
+        <tr class="text-gray-600 text-xs font-semibold uppercase tracking-wider">
+          <th class="px-4 py-2">Nombre</th>
+          <th class="px-4 py-2">Cédula/RUC</th>
+          <th class="px-4 py-2">Celular</th>
+          <th class="px-4 py-2">Dirección</th>
+          <th class="px-4 py-2">Correo</th>
+          <th class="px-4 py-2">Provincia</th>
+          <th class="px-4 py-2">Acciones</th>
+
+        </tr>
+      </thead>
+      <tbody>
+        {% for cliente in clientes_diccionario %}
+          <tr class="hover:bg-gray-50 transition">
+            <td class="px-4 py-2 font-semibold text-gray-900">{{ cliente.nombre }}</td>
+            <td class="px-4 py-2 max-w-[100px] truncate" title="{{ cliente.ruc_cedula }}" >{{ cliente.ruc_cedula }}</td>
+            <td class="px-4 py-2">{{ cliente.celular }}</td>
+            <td class="px-4 py-2 max-w-[100px] truncate" title="{{ cliente.direccion }}">{{ cliente.direccion }}</td>
+            <td class="px-4 py-2 text-blue-600">{{ cliente.correo }}</td>
+            <td class="px-4 py-2">{{ cliente.provincia }}</td>
+            <td class="px-4 py-2"> {{cliente.provincia}}</td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="6" class="px-4 py-4 text-center text-gray-500">No hay clientes registrados</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+<!-- Mensajes -->
+{% if messages %}
+  <ul class="mt-4 text-sm text-green-600">
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
 {% endblock %}

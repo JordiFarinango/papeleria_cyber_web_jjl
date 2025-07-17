@@ -28,6 +28,7 @@ class Producto(models.Model):
     descripcion = models. TextField(blank=True)
     precio = models.DecimalField(max_digits=10, decimal_places=2)
     stock = models.PositiveIntegerField()
+    foto = models.ImageField(upload_to='productos_img', blank=True, null=True)
 
     def __str__(self):
         return f"{self.nombre} - {self.marca}"

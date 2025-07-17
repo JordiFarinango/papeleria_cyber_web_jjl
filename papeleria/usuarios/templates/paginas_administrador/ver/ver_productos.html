@@ -8,6 +8,7 @@
 <table>
     <thead>
         <tr>
+            <th>Foto</th>
             <th>Nombre</th>
             <th>Marca</th>
             <th>Categoría</th>
@@ -19,6 +20,13 @@
     <tbody>
         {% for producto in productos %}
         <tr>
+            <td>
+                {% if producto.foto %}
+                <img src="{{producto.foto.url}}" alt="Imagen de {{producto.nombre}}" width="100">
+                {% else %}
+                    Sin imagen
+                {% endif %}
+            </td>
             <td>{{ producto.nombre }}</td>
             <td>{{ producto.marca.nombre }}</td>
             <td>{{ producto.categoria.nombre }}</td>

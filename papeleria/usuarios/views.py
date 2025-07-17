@@ -24,12 +24,13 @@ def nuevo_producto_admin(request):
         precio = request.POST.get('precio')
         categoria_id = request.POST.get('categoria')
         marca_id = request.POST.get('marca')
+        foto = request.POST.get('foto')
 
         marca = get_object_or_404(Marca, id=marca_id)
         categoria = get_object_or_404(Categoria, id=categoria_id)
 
         if nombre:
-            guardar_producto = Producto(nombre=nombre, descripcion=descripcion, stock=stock, precio=precio, categoria=categoria, marca=marca)
+            guardar_producto = Producto(nombre=nombre, descripcion=descripcion, stock=stock, precio=precio, categoria=categoria, marca=marca, foto=foto)
             guardar_producto.save()
             return redirect('nuevo_producto_admin')
         
