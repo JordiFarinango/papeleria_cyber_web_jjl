@@ -1,0 +1,38 @@
+{% load custom_filters %}
+{% if productos %}
+<table>
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Marca</th>
+            <th>Categoría</th>
+            <th>Precio</th>
+            <th>Stock</th>
+            <th>Acción</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for producto in productos %}
+        <tr>
+            <td>{{ producto.nombre }}</td>
+            <td>{{ producto.marca.nombre }}</td>
+            <td>{{ producto.categoria.nombre }}</td>
+            <td>{{ producto.precio }}</td> <!-- Verifica este valor en el HTML generado -->
+            <td>{{ producto.stock }}</td>
+            <td>
+                <button class="agregar-carrito" 
+                        data-id="{{ producto.id }}" 
+                        data-nombre="{{ producto.nombre }}" 
+                        data-marca="{{ producto.marca.nombre }}" 
+                        data-categoria="{{ producto.categoria.nombre }}" 
+                        data-precio="{{ producto.precio|decimal_point }}"> <!-- Inspecciona este data-precio -->
+                    Agregar al carrito
+                </button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No se encontraron productos.</p>
+{% endif %}

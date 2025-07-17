@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 from .models import Marca, Categoria, Proveedor, Producto, Cliente
+from django.http import JsonResponse
+from django.template.loader import render_to_string
 
 #pagina antes del login
 def inicio(request):
@@ -107,7 +109,11 @@ def nuevo_cliente_admin(request):
 def facturar_admin(request):
     return render(request, 'paginas_administrador/facturar.html')
 
-
+def buscar_productos(request):
+    query = request.GET.get('q', '') #http://127.0.0.1:8000/buscar_productos?q=lapiz, query almacena lo que estamos buscando, si no hay nada devuelve '', para que no de error
+    productos = Producto.objects.filter(nombre__icontains=query)[:10] #nombre es el campo del modelo Producto, _icontains, significa que contenga lo que tenga en query, sin importar mayusculas o minusculas, y que solo limite a 10 resultados, 
+    html = render_to_string('fragmentos/productos_filtrados.html',{'productos': productos}) #productos filtrados
+    return JsonResponse({'html': html}) #Json devuelve un diccionario convertido en JSON y puede ser leido desde javascript, para armar el div de resultado-productos
 
 def usuarios_admin(request):
     return render(request, 'paginas_administrador/agregar/usuarios.html')

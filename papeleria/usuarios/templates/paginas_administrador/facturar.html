@@ -1,7 +1,40 @@
 {% extends 'barra_navegacion/barra.html' %}
-
 {% block title %} Facturación {% endblock %}
 
 {% block content %}
-<a> aqui se va a facturar</a>
+
+<div>
+    <h2>Buscar productos</h2>
+    <input type="text" id="buscador-producto" placeholder="Buscar producto..." autocomplete="off">
+</div>
+
+<br>
+
+<div id="resultado-productos">
+<!--aqui aparecera la tabla con los resultados de la busqueda-->
+</div>
+
+
+<br>
+
+<!--carrito de compras-->
+<h2>Carrito de compras</h2>
+<table id="tabla-carrito">
+    <thead>
+        <tr>
+            <th class="p-2 border">Producto</th>
+            <th class="p-2 border">Cantidad</th>
+            <th class="p-2 border">Promoción</th>
+            <th class="p-2 border">Subtotal   </th>
+        </tr>
+    </thead>
+    <tbody id="cuerpo-carrito">
+        <!--Aqui se mostrara los productos seleccionados-->
+    </tbody>
+</table>
+
+<!--total-->
+<div>
+    Total: $<span id="total-carrito">0.00</span>
+</div>
 {% endblock %}
