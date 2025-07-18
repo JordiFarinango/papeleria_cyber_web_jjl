@@ -13,24 +13,27 @@
     </thead>
     <tbody>
         {% for producto in productos %}
-        <tr>
-            <td>{{ producto.nombre }}</td>
-            <td>{{ producto.marca.nombre }}</td>
-            <td>{{ producto.categoria.nombre }}</td>
-            <td>{{ producto.precio }}</td> <!-- Verifica este valor en el HTML generado -->
-            <td>{{ producto.stock }}</td>
-            <td>
-                <button class="agregar-carrito" 
-                        data-id="{{ producto.id }}" 
-                        data-nombre="{{ producto.nombre }}" 
-                        data-marca="{{ producto.marca.nombre }}" 
-                        data-categoria="{{ producto.categoria.nombre }}" 
-                        data-precio="{{ producto.precio|decimal_point }}"> <!-- Inspecciona este data-precio -->
-                    Agregar al carrito
+        <tr class="hover:bg-gray-50 transition text-sm">
+            <td class="px-2 py-2">{{ producto.nombre }}</td>
+            <td class="px-2 py-2">{{ producto.marca.nombre }}</td>
+            <td class="px-2 py-2">{{ producto.categoria.nombre }}</td>
+            <td class="px-2 py-2">${{ producto.precio }}</td>
+            <td class="px-2 py-2">{{ producto.stock }}</td>
+            <td class="px-2 py-2">
+                <button class="agregar-carrito bg-blue-600 text-white text-xs px-3 py-1 rounded-lg hover:bg-blue-700 transition"
+                        data-id="{{ producto.id }}"
+                        data-nombre="{{ producto.nombre }}"
+                        data-marca="{{ producto.marca.nombre }}"
+                        data-categoria="{{ producto.categoria.nombre }}"
+                        data-precio="{{ producto.precio|decimal_point }}"
+                        data-stock="{{ producto.stock }}">
+                        
+                    Agregar
                 </button>
             </td>
         </tr>
         {% endfor %}
+
     </tbody>
 </table>
 {% else %}

@@ -3,42 +3,49 @@
 
 {% block content %}
 
-<h1>Lista de Productos Registrados</h1>
+<div class="mt-8">
+  <h2 class="text-2xl font-semibold text-gray-800 mb-4">Productos Registrados</h2>
 
-<table>
-    <thead>
-        <tr>
-            <th>Foto</th>
-            <th>Nombre</th>
-            <th>Marca</th>
-            <th>Categoría</th>
-            <th>Descripción</th>
-            <th>Precio</th>
-            <th>Stock</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for producto in productos %}
-        <tr>
-            <td>
+  <div class="overflow-x-auto">
+    <div class="bg-white rounded-2xl shadow-md p-4">
+      <table class="min-w-full border-separate border-spacing-x-2 border-spacing-y-2 text-sm text-left text-gray-700">
+        <thead>
+          <tr class="text-gray-600 text-xs font-semibold uppercase tracking-wider">
+            <th class="px-4 py-2">Foto</th>
+            <th class="px-4 py-2">Nombre</th>
+            <th class="px-4 py-2">Marca</th>
+            <th class="px-4 py-2">Categoría</th>
+            <th class="px-4 py-2">Descripción</th>
+            <th class="px-4 py-2">Precio</th>
+            <th class="px-4 py-2">Stock</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for producto in productos %}
+            <tr class="hover:bg-gray-50 transition">
+              <td class="px-4 py-2">
                 {% if producto.foto %}
-                <img src="{{producto.foto.url}}" alt="Imagen de {{producto.nombre}}" width="100">
+                  <img src="{{ producto.foto.url }}" alt="Imagen de {{ producto.nombre }}" class="w-16 h-16 object-cover rounded-md">
                 {% else %}
-                    Sin imagen
+                  <span class="text-gray-400 italic">Sin imagen</span>
                 {% endif %}
-            </td>
-            <td>{{ producto.nombre }}</td>
-            <td>{{ producto.marca.nombre }}</td>
-            <td>{{ producto.categoria.nombre }}</td>
-            <td>{{ producto.descripcion }}</td>
-            <td>${{ producto.precio }}</td>
-            <td>{{ producto.stock }}</td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="6">No hay productos registrados.</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+              </td>
+              <td class="px-4 py-2 font-semibold text-gray-900">{{ producto.nombre }}</td>
+              <td class="px-4 py-2">{{ producto.marca.nombre }}</td>
+              <td class="px-4 py-2">{{ producto.categoria.nombre }}</td>
+              <td class="px-4 py-2 max-w-[100px] truncate" title="{{ producto.descripcion }}">{{ producto.descripcion }}</td>
+              <td class="px-4 py-2">${{ producto.precio }}</td>
+              <td class="px-4 py-2">{{ producto.stock }}</td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="7" class="px-4 py-4 text-center text-gray-500">No hay productos registrados.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
 {% endblock %}

@@ -24,7 +24,7 @@ def nuevo_producto_admin(request):
         precio = request.POST.get('precio')
         categoria_id = request.POST.get('categoria')
         marca_id = request.POST.get('marca')
-        foto = request.POST.get('foto')
+        foto = request.FILES.get('foto')
 
         marca = get_object_or_404(Marca, id=marca_id)
         categoria = get_object_or_404(Categoria, id=categoria_id)
@@ -49,6 +49,7 @@ def ingresar_inventario_admin(request):
     return render(request, 'paginas_administrador/agregar/ingresar_inventario.html')
 
 def marcas_admin(request):
+    marcas = Marca.objects.all()
     if request.method == 'POST': #si dio clic en guardar
         nombre = request.POST.get('nombre') #entonces guarda lo el contenido que haya escrito del cuadro del html con id nombre en esta varaible nombre
 
@@ -56,9 +57,12 @@ def marcas_admin(request):
             nueva_marca = Marca(nombre=nombre) #quiero crear una nueva marca con este nombre (primer 'nombre' es del modelo Marca de models, y el segundo 'nombre' es de la variable creada arriba)
             nueva_marca.save() #se guarda la marca en la base de datos
             return redirect('marcas_admin') #cuando se guarde, redirigimos al usuarios a marcas.html
-    return render(request, 'paginas_administrador/agregar/marcas.html')
+    return render(request, 'paginas_administrador/agregar/marcas.html',{
+        'marcas': marcas
+    })
 
 def categorias_admin(request):
+    categorias = Categoria.objects.all()
     if request.method == 'POST':
         nombre = request.POST.get('nombre')
 
@@ -66,7 +70,9 @@ def categorias_admin(request):
             nueva_categoria = Categoria(nombre=nombre)
             nueva_categoria.save()
             return redirect('categorias_admin')
-    return render(request, 'paginas_administrador/agregar/categorias.html')
+    return render(request, 'paginas_administrador/agregar/categorias.html',{
+        'categorias':categorias
+    })
 
 def nuevo_proveedor_admin(request):
     if request.method == 'POST':
@@ -112,7 +118,7 @@ def facturar_admin(request):
 
 def buscar_productos(request):
     query = request.GET.get('q', '') #http://127.0.0.1:8000/buscar_productos?q=lapiz, query almacena lo que estamos buscando, si no hay nada devuelve '', para que no de error
-    productos = Producto.objects.filter(nombre__icontains=query)[:10] #nombre es el campo del modelo Producto, _icontains, significa que contenga lo que tenga en query, sin importar mayusculas o minusculas, y que solo limite a 10 resultados, 
+    productos = Producto.objects.filter(nombre__icontains=query)[:7] #nombre es el campo del modelo Producto, _icontains, significa que contenga lo que tenga en query, sin importar mayusculas o minusculas, y que solo limite a 10 resultados, 
     html = render_to_string('fragmentos/productos_filtrados.html',{'productos': productos}) #productos filtrados
     return JsonResponse({'html': html}) #Json devuelve un diccionario convertido en JSON y puede ser leido desde javascript, para armar el div de resultado-productos
 

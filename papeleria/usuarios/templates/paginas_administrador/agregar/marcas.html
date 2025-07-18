@@ -3,11 +3,55 @@
 {% block title %} Marcas {% endblock %}
 
 {% block content %}
-<a>Registrar nueva marca</a>
+<div class="text-2xl font-semibold text-gray-800 mb-4">
+  <h2>Registrar Nueva Marca</h2>
+</div>
 
 <form method="POST">
-{% csrf_token %}
-<input type="text" name="nombre" placeholder="Nombre de la marca" required>
-<button type="submit">Guardar</button>
+  {% csrf_token %}
+  
+  <div class="max-w-md grid grid-cols-1 gap-4 mt-6">
+    <label class="flex flex-col text-xs font-sans text-gray-500">
+      <span class="mb-1 font-semibold tracking-wide">Nombre de la Marca</span>
+      <input type="text" name="nombre" required placeholder="Ej. Faber-Castell" class="border border-gray-300 rounded-md py-1 px-3 text-sm font-sans text-gray-900 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+    </label>
+
+    <div class="flex mt-4">
+      <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-1 px-6 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">Guardar Marca</button>
+    </div>
+  </div>
 </form>
+
+<div class="text-xl font-semibold text-gray-800 mb-4">
+  <h2>Marcas Registradas</h2>
+</div>
+
+<!-- CONTENEDOR CON ANCHO LIMITADO -->
+<div class="mt-4 max-w-2xl mx-auto">
+  <div class="bg-white rounded-xl shadow-md overflow-hidden">
+    <table class="w-full text-sm text-left text-gray-700">
+      <thead class="bg-gray-100 border-b">
+        <tr class="text-xs text-gray-600 uppercase tracking-wide">
+          <th class="px-4 py-2">Nombre</th>
+          <th class="px-4 py-2">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for marca in marcas %}
+        <tr class="hover:bg-gray-50 border-b">
+          <td class="px-4 py-2">{{ marca.nombre }}</td>
+          <td class="px-4 py-2 text-blue-600">Editar / Eliminar</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="2" class="px-4 py-4 text-center text-gray-500">No hay marcas registradas</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+
 {% endblock %}
