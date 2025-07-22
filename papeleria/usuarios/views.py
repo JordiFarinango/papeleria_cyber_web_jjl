@@ -20,7 +20,7 @@ def nuevo_producto_admin(request):
     if request.method == 'POST':
         nombre = request.POST.get('nombre')
         descripcion = request.POST.get('descripcion')
-        stock = request.POST.get('stock')
+        stock = int(request.POST.get('stock'))  # ← conversión segura
         precio = request.POST.get('precio')
         categoria_id = request.POST.get('categoria')
         marca_id = request.POST.get('marca')

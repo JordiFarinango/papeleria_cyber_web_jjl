@@ -49,19 +49,25 @@ document.addEventListener('click', function (e) {
     const marca = boton.getAttribute('data-marca');
     const categoria = boton.getAttribute('data-categoria');
     const precio = parseFloat(boton.getAttribute('data-precio'));
+    const stock = parseInt(boton.getAttribute('data-stock')); // nuevo
 
     const nombreCompleto = `${nombre} (${marca} - ${categoria})`;
 
-    // Verificar si el producto ya está en el carrito
     const filas = document.querySelectorAll('#cuerpo-carrito tr');
     let productoEncontrado = false;
 
     filas.forEach(fila => {
       const celdaNombre = fila.querySelector('td');
       if (celdaNombre.textContent === nombreCompleto) {
-        // Ya existe: aumentar la cantidad y actualizar subtotal
         const celdaCantidad = fila.children[1];
         let cantidadActual = parseInt(celdaCantidad.textContent);
+
+        if (cantidadActual >= stock) {
+          alert("No hay suficiente stock disponible.");
+          productoEncontrado = true;
+          return;
+        }
+
         cantidadActual += 1;
         celdaCantidad.textContent = cantidadActual;
 
@@ -72,8 +78,12 @@ document.addEventListener('click', function (e) {
       }
     });
 
-    // Si no existe, agregar una nueva fila
     if (!productoEncontrado) {
+      if (stock <= 0) {
+        alert("No hay stock disponible.");
+        return;
+      }
+
       const nuevaFila = document.createElement('tr');
       nuevaFila.innerHTML = `
         <td class="p-2 border">${nombreCompleto}</td>
@@ -98,5 +108,3 @@ function recalcularTotal() {
 
   document.getElementById('total-carrito').textContent = total.toFixed(2);
 }
-
-
