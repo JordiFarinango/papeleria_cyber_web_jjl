@@ -140,3 +140,58 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     });
 });
+
+// para actualizar el stock
+document.addEventListener('click', function (e) {
+    if (e.target.classList.contains('btn-actualizar-stock')) {
+        const fila = e.target.closest('tr');
+        const productoId = fila.getAttribute('data-producto-id');
+        const inputCantidad = fila.querySelector('.input-cantidad');
+        const cantidad = parseInt(inputCantidad.value);
+
+        if (!cantidad || cantidad <= 0) {
+            alert("Ingresa una cantidad válida");
+            return;
+        }
+
+        fetch('/actualizar-stock/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            body: JSON.stringify({
+                producto_id: productoId,
+                cantidad: cantidad
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.exito) {
+                // Actualizar el valor mostrado
+                const stockActualTd = fila.querySelector('.stock-actual');
+                stockActualTd.textContent = data.nuevo_stock;
+                inputCantidad.value = '';
+            } else {
+                alert("Error: " + data.error);
+            }
+        });
+    }
+});
+
+// Función para obtener CSRF
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+

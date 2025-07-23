@@ -4,6 +4,9 @@ from django.contrib import messages
 from .models import Marca, Categoria, Proveedor, Producto, Cliente
 from django.http import JsonResponse
 from django.template.loader import render_to_string
+from django.views.decorators.csrf import csrf_exempt
+import json
+
 
 #pagina antes del login
 def inicio(request):
@@ -138,3 +141,23 @@ def filtrar_productos_por_categoria(request, categoria_id):
     productos = Producto.objects.filter(categoria_id=categoria_id)
     return render(request, 'fragmentos/filtrar_productos_por_categoria.html', {
         'productos': productos})
+
+@csrf_exempt
+def actualizar_stock(request):
+    if request.method == 'POST':
+        try:
+            datos = json.loads(request.body)
+            producto_id = datos.get('producto_id')
+            cantidad = int(datos.get('cantidad'))
+
+            producto = Producto.objects.get(id=producto_id)
+            producto.stock += cantidad
+            producto.save()
+
+            return JsonResponse({'exito': True, 'nuevo_stock': producto.stock})
+        except Producto.DoesNotExist:
+            return JsonResponse({'exito': False, 'error': 'Producto no encontrado'})
+        except Exception as e:
+            return JsonResponse({'exito': False, 'error': str(e)})
+
+    return JsonResponse({'exito': False, 'error': 'Método no permitido'})

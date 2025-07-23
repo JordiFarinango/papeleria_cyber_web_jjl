@@ -1,16 +1,16 @@
 {% for producto in productos %}
-<tr>
+<tr data-producto-id="{{ producto.id }}">
     <td>{{ producto.nombre }}</td>
-    <td>{{ producto.stock }}</td>
+    <td class="stock-actual">{{ producto.stock }}</td>
     <td>
-        <input type="number" min="1" placeholder="Cantidad">
+        <input type="number" min="1" placeholder="Cantidad" class="input-cantidad">
     </td>
     <td>
-        <button onclick="agregarProducto({{ producto.id }}, this)">Añadir</button>
+        <button class="btn-actualizar-stock">Añadir</button>
     </td>
 </tr>
 {% empty %}
 <tr>
-    <td>No hay productos en esta categoria</td>
+    <td colspan="4">No hay productos en esta categoría</td>
 </tr>
 {% endfor %}
