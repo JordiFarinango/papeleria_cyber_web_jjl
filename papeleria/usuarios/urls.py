@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import inicio_admin, inicio, nuevo_producto_admin, ver_productos_admin, facturar_admin, usuarios_admin, ingresar_inventario_admin, marcas_admin, categorias_admin, nuevo_proveedor_admin, nuevo_cliente_admin, buscar_productos
+from .views import inicio_admin, inicio, nuevo_producto_admin, ver_productos_admin, facturar_admin, usuarios_admin, ingresar_inventario_admin, marcas_admin, categorias_admin, nuevo_proveedor_admin, nuevo_cliente_admin, buscar_productos, filtrar_productos_por_categoria
 
 urlpatterns = [
     path('', inicio, name="inicio"),
@@ -12,6 +12,9 @@ urlpatterns = [
     path('nuevo_proveedor/', nuevo_proveedor_admin, name='nuevo_proveedor_admin'),
     path('nuevo_cliente/', nuevo_cliente_admin, name='nuevo_cliente_admin'),
     path('buscar_productos/', buscar_productos, name='buscar_productos'),
+
+    path('filtrar_productos_por_categoria/<int:categoria_id>/', filtrar_productos_por_categoria, name='filtrar_productos_por_categoria'),
+
 
     path('facturar/', facturar_admin, name='facturar_admin'),
     path('usuarios/', usuarios_admin, name='usuarios_admin' ),

@@ -108,3 +108,35 @@ function recalcularTotal() {
 
   document.getElementById('total-carrito').textContent = total.toFixed(2);
 }
+
+
+//Funcion para mostrar los productos para ingresar el inventario nuevo
+document.addEventListener("DOMContentLoaded", function () {
+    const selectCategoria = document.getElementById("categoria-select");
+    const cuerpoTabla = document.getElementById("tabla-productos");
+
+    selectCategoria.addEventListener("change", function () {
+        const categoriaId = this.value;
+
+        // Si no se selecciona ninguna categoría
+        if (!categoriaId) {
+            cuerpoTabla.innerHTML = "<tr><td colspan='4'>Selecciona una categoría</td></tr>";
+            return;
+        }
+
+        fetch(`/filtrar_productos_por_categoria/${categoriaId}/`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Error al cargar productos");
+                }
+                return response.text();
+            })
+            .then(data => {
+                cuerpoTabla.innerHTML = data;
+            })
+            .catch(error => {
+                cuerpoTabla.innerHTML = "<tr><td colspan='4'>Hubo un error al cargar productos</td></tr>";
+                console.error(error);
+            });
+    });
+});

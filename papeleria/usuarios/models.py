@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 class Proveedor(models.Model):
     nombre = models.CharField(max_length = 100)
@@ -43,3 +44,12 @@ class Cliente(models.Model):
 
     def __str__(self):
         return f"{self.nombre} - {self.ruc_cedula}"
+
+class IngresoInventario(models.Model):
+    producto = models.ForeignKey('Producto', on_delete=models.CASCADE)
+    cantidad_ingesada = models.PositiveIntegerField()
+    fecha_ingreso = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"{self.producto.nombre} - {self.cantidad_ingesada} - el {self.fecha_ingreso.strftime('%Y-%m-%d %H:%M')}"
+    

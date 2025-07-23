@@ -20,7 +20,7 @@ def nuevo_producto_admin(request):
     if request.method == 'POST':
         nombre = request.POST.get('nombre')
         descripcion = request.POST.get('descripcion')
-        stock = int(request.POST.get('stock'))  # ← conversión segura
+        stock = request.POST.get('stock')
         precio = request.POST.get('precio')
         categoria_id = request.POST.get('categoria')
         marca_id = request.POST.get('marca')
@@ -46,7 +46,13 @@ def ver_productos_admin(request):
     })
 
 def ingresar_inventario_admin(request):
-    return render(request, 'paginas_administrador/agregar/ingresar_inventario.html')
+    productos = Producto.objects.all()
+    categorias = Categoria.objects.all()
+
+    return render(request, 'paginas_administrador/agregar/ingresar_inventario.html',{
+        'categorias': categorias,
+        'productos': productos,
+    })
 
 def marcas_admin(request):
     marcas = Marca.objects.all()
@@ -116,12 +122,19 @@ def nuevo_cliente_admin(request):
 def facturar_admin(request):
     return render(request, 'paginas_administrador/facturar.html')
 
+def usuarios_admin(request):
+    return render(request, 'paginas_administrador/agregar/usuarios.html')
+
+
+
 def buscar_productos(request):
     query = request.GET.get('q', '') #http://127.0.0.1:8000/buscar_productos?q=lapiz, query almacena lo que estamos buscando, si no hay nada devuelve '', para que no de error
     productos = Producto.objects.filter(nombre__icontains=query)[:7] #nombre es el campo del modelo Producto, _icontains, significa que contenga lo que tenga en query, sin importar mayusculas o minusculas, y que solo limite a 10 resultados, 
     html = render_to_string('fragmentos/productos_filtrados.html',{'productos': productos}) #productos filtrados
     return JsonResponse({'html': html}) #Json devuelve un diccionario convertido en JSON y puede ser leido desde javascript, para armar el div de resultado-productos
 
-def usuarios_admin(request):
-    return render(request, 'paginas_administrador/agregar/usuarios.html')
 
+def filtrar_productos_por_categoria(request, categoria_id):
+    productos = Producto.objects.filter(categoria_id=categoria_id)
+    return render(request, 'fragmentos/filtrar_productos_por_categoria.html', {
+        'productos': productos})

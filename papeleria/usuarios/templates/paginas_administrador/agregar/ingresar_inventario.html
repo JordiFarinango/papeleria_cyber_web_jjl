@@ -2,5 +2,27 @@
 {% block title %} Ingresar inventario {% endblock %}
 
 {% block content%}
-<a>Ingresar inventario</a>
+
+<select name="categoria-select" id="categoria-select">
+    <option value="">-- Selecciona una categoria --</option>
+    {% for categoria in categorias %}
+    <option value="{{categoria.id}}">{{ categoria.nombre }}</option>
+    {% endfor %}
+</select>
+
+<table>
+    <thead>
+        <tr>
+            <th>Producto</th>
+            <th>Stock Actual</th>
+            <th>Nuevo Stock</th>
+            <th>Acción</th>
+        </tr>
+    </thead>
+
+    <tbody id="tabla-productos">
+        <!--aqui apareceran los resultados-->
+    </tbody>
+</table>
+
 {% endblock %}

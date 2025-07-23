@@ -1,0 +1,16 @@
+{% for producto in productos %}
+<tr>
+    <td>{{ producto.nombre }}</td>
+    <td>{{ producto.stock }}</td>
+    <td>
+        <input type="number" min="1" placeholder="Cantidad">
+    </td>
+    <td>
+        <button onclick="agregarProducto({{ producto.id }}, this)">Añadir</button>
+    </td>
+</tr>
+{% empty %}
+<tr>
+    <td>No hay productos en esta categoria</td>
+</tr>
+{% endfor %}
