@@ -15,4 +15,56 @@
     <button type="submit">Guardar</button>
 </form>
 
+
+<table>
+    <thead>
+        <tr>
+            <th class="px-4 py-2">Nombre</th>
+            <th class="px-4 py-2">Celular</th>
+            <th class="px-4 py-2">Cédula</th>
+            <th class="px-4 py-2">Dirección</th>
+            <th class="px-4 py-2">Acciones</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for proveedor in proveedores %}
+        <tr>
+            <td class="px-4 py-2">{{ proveedor.nombre }} </td>
+            <td class="px-4 py-2">{{ proveedor.celular }}</td>
+            <td class="px-4 py-2">{{ proveedor.ruc_cedula }}</td>
+            <td class="px-4 py-2">{{ proveedor.direccion }}</td>
+            <td class="px-4 py-2">
+                <div>
+                    <button class="fa-solid fa-pen-to-square text-blue-600 hover:text-blue-800 cursor-pointer" onclick="modalEditarProveedor()"></button>
+
+                    <i class="fa-solid fa-trash text-red-600 hover:text-red-800 cursor-pointer" onclick="modalEliminarProveedor('{{proveedor.id}}','{{proveedor.nombre}}')"></i>
+                </div>
+            </td>
+
+        </tr>
+        {% empty %}
+        <tr>
+            <td colapsan="4">No hay clientes registrados</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div id="modalEliminar" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center hidden z-50">
+    <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
+        <h2 class="text-lg font-semibold mb-4 text-gray-800">¿Eliminar Cliente?</h2>
+        <p class="mb-6 text-gray-600" id="modalTexto"></p>
+        <form action="{% url 'eliminar_proveedor' %}" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="id_proveedor" id="id_proveedor">
+        <div class="flex justify-end gap-3">
+            <button type="button" onclick="cerrarModalProveedor()" class="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded">Cancelar</button>
+            <button type="submit" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded">Eliminar</button>
+            
+        </div>
+        </form>
+    </div>
+ 
+</div>
 {% endblock %}

@@ -84,6 +84,7 @@ def categorias_admin(request):
     })
 
 def nuevo_proveedor_admin(request):
+    proveedores = Proveedor.objects.all()
     if request.method == 'POST':
         nombre = request.POST.get('nombre')
         celular = request.POST.get('celular')
@@ -94,7 +95,18 @@ def nuevo_proveedor_admin(request):
             nuevo_proveedor = Proveedor(nombre=nombre, celular=celular, ruc_cedula=cedula, direccion=direccion)
             nuevo_proveedor.save()
             return redirect('nuevo_proveedor_admin')
-    return render (request, 'paginas_administrador/agregar/nuevo_proveedor.html')
+    return render (request, 'paginas_administrador/agregar/nuevo_proveedor.html',{
+        'proveedores' : proveedores
+    })
+
+def eliminar_proveedor(request):
+    proveedor_id = request.POST.get("id_proveedor")
+    proveedor = get_object_or_404(Proveedor, id=proveedor_id)
+    proveedor.delete()
+    return redirect('nuevo_proveedor_admin')
+
+
+
 
 def nuevo_cliente_admin(request):
     clientes = Cliente.objects.all()
@@ -161,3 +173,35 @@ def actualizar_stock(request):
             return JsonResponse({'exito': False, 'error': str(e)})
 
     return JsonResponse({'exito': False, 'error': 'Método no permitido'})
+
+
+def eliminar_cliente(request):
+
+    cliente_id = request.POST.get("cliente_id")
+    cliente = get_object_or_404(Cliente, id=cliente_id)
+    cliente.delete()
+    return redirect("nuevo_cliente_admin")
+
+def editar_cliente(request):
+    cliente_id = request.POST.get('modalClienteId')
+    nombre = request.POST.get('nombre')
+    cedula = request.POST.get('ruc_cedula')
+    celular = request.POST.get('celular')
+    direccion = request.POST.get('direccion')
+    correo = request.POST.get('correo')
+    provincia = request.POST.get('provincia')
+
+    if nombre:
+        cliente = get_object_or_404(Cliente, id=cliente_id)
+        cliente.nombre = nombre
+        cliente.ruc_cedula = cedula
+        cliente.celular = celular
+        cliente.direccion = direccion
+        cliente.correo = correo
+        cliente.provincia = provincia
+        cliente.save()
+
+        return redirect('nuevo_cliente_admin')
+
+
+    

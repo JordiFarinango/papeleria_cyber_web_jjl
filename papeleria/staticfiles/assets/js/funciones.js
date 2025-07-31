@@ -195,3 +195,39 @@ function getCookie(name) {
     return cookieValue;
 }
 
+function abrirModalEliminar(id, nombre) {
+  document.getElementById("modalClienteId").value = id;
+  document.getElementById("modalTexto").textContent = `¿Estás seguro de que deseas eliminar a "${nombre}"?`;
+  document.getElementById("modalEliminar").classList.remove("hidden");
+}
+function cerrarModal() {
+  document.getElementById("modalEliminar").classList.add("hidden");
+}
+
+function abrirModalEditar(id, nombre, ruc_cedula, celular, direccion, correo, provincia) {
+    // Mostramos el modal
+    document.getElementById("modalEditar").classList.remove("hidden");
+    // Llenamos los campos del formulario con los datos correctos
+    document.getElementById("editarClienteId").value = id;
+    document.getElementById("editarNombre").value = nombre;
+    document.getElementById("editarCedula").value = ruc_cedula;
+    document.getElementById("editarCelular").value = celular;
+    document.getElementById("editarDireccion").value = direccion;
+    document.getElementById("editarCorreo").value = correo;
+    document.getElementById("editarProvincia").value = provincia;
+}
+function cerrarModalEditar() {
+    document.getElementById("modalEditar").classList.add("hidden");
+}
+
+function modalEliminarProveedor(id, nombre){
+  document.getElementById("id_proveedor").value = id;
+  document.getElementById("modalTexto").textContent = `¿Esta seguro de que desea eliminar al proveedor "${nombre}"?`;
+  document.getElementById("modalEliminar").classList.remove("hidden");
+}
+
+function cerrarModalProveedor(){
+  document.getElementById("modalEliminar").classList.add("hidden");
+}
+
+
