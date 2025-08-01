@@ -45,46 +45,52 @@
   </div>
 </form>
 
+<div class="text-2xl font-semibold text-gray-800 mb-4">
+    <h2>Proveedores Registrados</h2>
+</div>
 
-<table>
-    <thead>
-        <tr>
-            <th class="px-4 py-2">Nombre</th>
-            <th class="px-4 py-2">Celular</th>
-            <th class="px-4 py-2">Cédula</th>
-            <th class="px-4 py-2">Dirección</th>
-            <th class="px-4 py-2">Acciones</th>
-        </tr>
-    </thead>
+<div class="overflow-x-auto mt-8">
+    <div class="bg-white rounded-2xl shadow-md p-4">
+        <table class="min-w-full border-separate border-spacing-x-2 border-spacing-y-2 text-sm text-left text-gray-700">
+            <thead>
+                <tr class="text-gray-600 text-xs font-semibold uppercase tracking-wider">
+                    <th class="px-4 py-2">Nombre</th>
+                    <th class="px-4 py-2">Celular</th>
+                    <th class="px-4 py-2">Cédula</th>
+                    <th class="px-4 py-2">Dirección</th>
+                    <th class="px-4 py-2">Acciones</th>
+                </tr>
+            </thead>
 
-    <tbody>
-        {% for proveedor in proveedores %}
-        <tr>
-            <td class="px-4 py-2">{{ proveedor.nombre }} </td>
-            <td class="px-4 py-2">{{ proveedor.celular }}</td>
-            <td class="px-4 py-2">{{ proveedor.ruc_cedula }}</td>
-            <td class="px-4 py-2">{{ proveedor.direccion }}</td>
-            <td class="px-4 py-2">
-                <div>
-                    <button class="fa-solid fa-pen-to-square text-blue-600 hover:text-blue-800 cursor-pointer" onclick="modalEditarProveedor(
-                        '{{proveedor.id}}', 
-                        '{{proveedor.nombre}}',
-                        '{{proveedor.celular}}',
-                        '{{proveedor.ruc_cedula}}',
-                        '{{proveedor.direccion}}')"></button>
+            <tbody>
+                {% for proveedor in proveedores %}
+                <tr class="hover:bg-gray-50 transition">
+                    <td class="px-4 py-2 font-semibold text-gray-900">{{ proveedor.nombre }} </td>
+                    <td class="px-4 py-2">{{ proveedor.celular }}</td>
+                    <td class="px-4 py-2">{{ proveedor.ruc_cedula }}</td>
+                    <td class="px-4 py-2 max-w-[100px] truncate" title="{{ proveedor.direccion }}">{{ proveedor.direccion }}</td>
+                    <td class="px-4 py-2">
+                        <div>
+                            <button class="fa-solid fa-pen-to-square text-blue-600 hover:text-blue-800 cursor-pointer" onclick="modalEditarProveedor(
+                                '{{proveedor.id}}', 
+                                '{{proveedor.nombre}}',
+                                '{{proveedor.celular}}',
+                                '{{proveedor.ruc_cedula}}',
+                                '{{proveedor.direccion}}')"></button>
 
-                    <i class="fa-solid fa-trash text-red-600 hover:text-red-800 cursor-pointer" onclick="modalEliminarProveedor('{{proveedor.id}}','{{proveedor.nombre}}')"></i>
-                </div>
-            </td>
+                            <i class="fa-solid fa-trash text-red-600 hover:text-red-800 cursor-pointer" onclick="modalEliminarProveedor('{{proveedor.id}}','{{proveedor.nombre}}')"></i>
+                        </div>
+                    </td>
 
-        </tr>
-        {% empty %}
-        <tr>
-            <td colapsan="4">No hay clientes registrados</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colapsan="4">No hay clientes registrados</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
 
 <div id="modalEliminar" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center hidden z-50">
     <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
@@ -124,6 +130,7 @@
         </form>
 
     </div>
-
+    </div>
+</div>
 </div>
 {% endblock %}
