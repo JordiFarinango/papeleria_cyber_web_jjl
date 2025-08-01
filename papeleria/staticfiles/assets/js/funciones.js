@@ -220,6 +220,7 @@ function cerrarModalEditar() {
     document.getElementById("modalEditar").classList.add("hidden");
 }
 
+
 function modalEliminarProveedor(id, nombre){
   document.getElementById("id_proveedor").value = id;
   document.getElementById("modalTexto").textContent = `¿Esta seguro de que desea eliminar al proveedor "${nombre}"?`;
@@ -231,3 +232,12 @@ function cerrarModalProveedor(){
 }
 
 
+function modalEditarProveedor(id, nombre, celular, ruc_cedula, direccion){
+  document.getElementById("modalEditar").classList.remove("hidden");
+
+  document.getElementById("id_proveedor_eli").value = id;
+  document.getElementById("nombre").value = nombre;
+  document.getElementById("celular").value = celular;
+  document.getElementById("ruc_cedula").value = ruc_cedula;
+  document.getElementById("direccion").value = direccion;
+}

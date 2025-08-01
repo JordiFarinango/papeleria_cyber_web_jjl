@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import inicio_admin, inicio, nuevo_producto_admin, ver_productos_admin, facturar_admin, usuarios_admin, ingresar_inventario_admin, marcas_admin, categorias_admin, nuevo_proveedor_admin, nuevo_cliente_admin, buscar_productos, filtrar_productos_por_categoria, actualizar_stock, eliminar_cliente, editar_cliente, eliminar_proveedor
+from .views import inicio_admin, inicio, nuevo_producto_admin, ver_productos_admin, facturar_admin, usuarios_admin, ingresar_inventario_admin, marcas_admin, categorias_admin, nuevo_proveedor_admin, nuevo_cliente_admin, buscar_productos, filtrar_productos_por_categoria, actualizar_stock, eliminar_cliente, editar_cliente, eliminar_proveedor, editar_proveedor
 
 urlpatterns = [
     path('', inicio, name="inicio"),
@@ -17,6 +17,7 @@ urlpatterns = [
     path('actualizar-stock/', actualizar_stock, name='actualizar_stock'),
 
     path('eliminar/proveedor/', eliminar_proveedor, name='eliminar_proveedor'),
+    path('editar/proveedor/', editar_proveedor, name='editar_proveedor'),
     path('eliminar/cliente/', eliminar_cliente, name="eliminar_cliente"),
     path('editar/cliente/', editar_cliente, name="editar_cliente"),
 

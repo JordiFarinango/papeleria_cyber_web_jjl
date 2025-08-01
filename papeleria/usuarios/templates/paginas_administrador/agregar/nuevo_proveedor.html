@@ -4,15 +4,45 @@
 
 {% block content %}
 
-<h1>Nuevo Proveedor</h1>
-
 <form method="POST">
-    {% csrf_token %}
-    <input type="text" name="nombre" placeholder="Nombre" required>
-    <input type="text" name="celular" placeholder="Celular" required>
-    <input type="text" name="cedula" placeholder="Cédula" required>
-    <textarea rows="3" name="direccion" placeholder="Dirección" required></textarea>
-    <button type="submit">Guardar</button>
+  {% csrf_token %}
+  <div class="text-2xl font-semibold text-gray-800 mb-4">
+    <h2>Agregar Nuevo Proveedor</h2>
+  </div>
+
+  <div class="max-w-4xl grid grid-cols-1 md:grid-cols-[2fr_1fr_1fr] gap-4 mt-6">
+
+    <label class="flex flex-col text-xs font-sans text-gray-500">
+      <span class="mb-1 font-semibold tracking-wide">Nombre</span>
+      <input type="text" name="nombre" required
+        class="border border-gray-300 rounded-md py-1 px-3 text-sm font-sans text-gray-900 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+    </label>
+
+    <label class="flex flex-col text-xs font-sans text-gray-500">
+      <span class="mb-1 font-semibold tracking-wide">Cédula o RUC</span>
+      <input type="text" name="cedula" required
+        class="border border-gray-300 rounded-md py-1 px-3 text-sm font-sans text-gray-900 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+    </label>
+
+    <label class="flex flex-col text-xs font-sans text-gray-500">
+      <span class="mb-1 font-semibold tracking-wide">Celular</span>
+      <input type="text" name="celular" required
+        class="border border-gray-300 rounded-md py-1 px-3 text-sm font-sans text-gray-900 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+    </label>
+
+    <label class="flex flex-col text-xs font-sans text-gray-500 md:col-span-3">
+      <span class="mb-1 font-semibold tracking-wide">Dirección</span>
+      <textarea name="direccion" rows="2" required
+        class="border border-gray-300 rounded-md py-1 px-3 text-sm font-sans text-gray-900 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"></textarea>
+    </label>
+
+    <div class="md:col-span-3 flex mt-4">
+      <button type="submit"
+        class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-1 px-6 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        Guardar Proveedor
+      </button>
+    </div>
+  </div>
 </form>
 
 
@@ -36,7 +66,12 @@
             <td class="px-4 py-2">{{ proveedor.direccion }}</td>
             <td class="px-4 py-2">
                 <div>
-                    <button class="fa-solid fa-pen-to-square text-blue-600 hover:text-blue-800 cursor-pointer" onclick="modalEditarProveedor()"></button>
+                    <button class="fa-solid fa-pen-to-square text-blue-600 hover:text-blue-800 cursor-pointer" onclick="modalEditarProveedor(
+                        '{{proveedor.id}}', 
+                        '{{proveedor.nombre}}',
+                        '{{proveedor.celular}}',
+                        '{{proveedor.ruc_cedula}}',
+                        '{{proveedor.direccion}}')"></button>
 
                     <i class="fa-solid fa-trash text-red-600 hover:text-red-800 cursor-pointer" onclick="modalEliminarProveedor('{{proveedor.id}}','{{proveedor.nombre}}')"></i>
                 </div>
@@ -53,7 +88,7 @@
 
 <div id="modalEliminar" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center hidden z-50">
     <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
-        <h2 class="text-lg font-semibold mb-4 text-gray-800">¿Eliminar Cliente?</h2>
+        <h2 class="text-lg font-semibold mb-4 text-gray-800">¿Eliminar proveedor?</h2>
         <p class="mb-6 text-gray-600" id="modalTexto"></p>
         <form action="{% url 'eliminar_proveedor' %}" method="POST">
         {% csrf_token %}
@@ -66,5 +101,29 @@
         </form>
     </div>
  
+</div>
+
+
+<div id="modalEditar" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center hidden z-50">
+    <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
+        <h2 class="text-lg font-semibold mb-4 text-gray-800">Editar Proveedor</h2>
+        <form action="{% url 'editar_proveedor' %}" method="POST" id="formEditarProveedor">
+            {% csrf_token %}
+            <div class="grid grid-cols-1 gap-4 mb-4">
+                <input type="" id="id_proveedor_eli" name="id_proveedor_eli">
+                <input type="text" id="nombre" name="nombre" class="border p-2 rounded w-full">
+                <input type="text" id="celular" name="celular" class="border p-2 rounded w-full">
+                <input type="text" id="ruc_cedula" name="ruc_cedula" class="border p-2 rounded w-full">
+                <textarea name="direccion" id="direccion" class="border p-2 rounded w-full" rows="3"></textarea>
+            </div>
+
+            <div>
+                <button type="button" onclick="cerrarModalEditar()" class="bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400">Cancelar</button>
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Actualizar</button>
+            </div>
+        </form>
+
+    </div>
+
 </div>
 {% endblock %}

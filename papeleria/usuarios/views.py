@@ -105,6 +105,25 @@ def eliminar_proveedor(request):
     proveedor.delete()
     return redirect('nuevo_proveedor_admin')
 
+def editar_proveedor(request):
+    id_proveedor = request.POST.get("id_proveedor_eli")
+    nombre = request.POST.get("nombre")
+    celular = request.POST.get("celular")
+    ruc_cedula = request.POST.get("ruc_cedula")
+    direccion = request.POST.get("direccion")
+
+    if nombre:
+        proveedor = get_object_or_404(Proveedor, id=id_proveedor)
+        proveedor.nombre = nombre
+        proveedor.celular = celular
+        proveedor.ruc_cedula = ruc_cedula
+        proveedor.direccion = direccion
+        proveedor.save()
+        return redirect("nuevo_proveedor_admin")
+   
+
+
+
 
 
 
