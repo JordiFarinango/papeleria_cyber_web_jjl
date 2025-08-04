@@ -1,4 +1,7 @@
+
 {% extends 'barra_navegacion/barra.html' %}
+{% load custom_filters %}
+
 {% block title %} Ver productos {% endblock %}
 
 {% block content %}
@@ -18,6 +21,7 @@
             <th class="px-4 py-2">Descripción</th>
             <th class="px-4 py-2">Precio</th>
             <th class="px-4 py-2">Stock</th>
+            <th class="px-4 py-2">Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -36,6 +40,23 @@
               <td class="px-4 py-2 max-w-[100px] truncate" title="{{ producto.descripcion }}">{{ producto.descripcion }}</td>
               <td class="px-4 py-2">${{ producto.precio }}</td>
               <td class="px-4 py-2">{{ producto.stock }}</td>
+              <td class="px-4 py-2">
+                <div>
+                  <button class="fa-solid fa-pen-to-square text-blue-600 hover:text-blue-800 cursor-pointer" 
+                  onclick="modalEditarProducto(
+                    '{{producto.id}}',
+                    '{{producto.nombre}}',
+                    '{{producto.marca.id}}',
+                    '{{producto.categoria.id}}',
+                    '{{producto.descripcion}}',
+                    '{{producto.precio|decimal_point}}',
+                    '{{producto.stock}}',
+                    '{{ producto.foto.url }}'
+                  )"></button>
+
+                  <button class="fa-solid fa-trash text-red-600 hover:text-red-800 cursor-pointer" onclick="modalEliminarProducto('{{producto.id}}', '{{producto.nombre}}')"></button>
+                </div>
+              </td>
             </tr>
           {% empty %}
             <tr>
@@ -44,6 +65,65 @@
           {% endfor %}
         </tbody>
       </table>
+
+      <div id="modalEliminar" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center hidden z-50"> 
+        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
+          <h2 class="text-lg font-semibold mb-4 text-gray-800">Eliminar Producto</h2>
+          <p class="mb-6 text-gray-600" id="modalTextoProductoEli"></p>
+          <form action="{% url 'eliminar_producto' %}" method="POST">
+            {% csrf_token %}
+            <input type="" id="id_producto" name="id_producto">
+            <div>
+              <button type="button" class="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded" onclick="cerrarModal()">Cancelar</button>
+              <button type="submit" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded">Eliminar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div id="modalEditar" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center hidden z-50">
+        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
+          <h2 class="text-lg font-semibold mb-4 text-gray-800">Editar Proveedor</h2>
+          <form action="{% url 'editar_producto'%}" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="grid grid-cols-1 gap-4 mb-4">
+              <input type="" id="id_producto_editar" name="id_producto_editar">
+              <input type="text" id="nombre" name="nombre" class="border p-2 rounded w-full">
+              <textarea name="descripcion" id="descripcion" class="border p-2 rounded w-full"></textarea>
+              <input type="number" id="stock" name="stock" class="border p-2 rounded w-full">
+              <input type="number" step="0.01" min="0" id="precio" name="precio" class="border p-2 rounded w-full">
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Marca</label>
+                <select name="marca_id" id="marca_id"class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                  <option value="">Seleccione una marca</option>
+                  {% for marca in marcas %}
+                  <option value="{{marca.id}}">{{marca.nombre}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <div>
+              <label class="block text-sm font-medium text-gray-700">Categoria</label>
+              <select name="categoria_id" id="categoria_id" class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+              <option value="">Seleccione una categoria</option>
+              {% for categoria in categorias %}
+              <option value="{{categoria.id}}">{{categoria.nombre}}</option>
+              {% endfor %}
+              </select>
+              </div>
+
+              <img id="preview_foto" src="" alt="Foto actual" class="w-32 h-32 object-cover mb-2">
+              <input type="file" accept="image/*" id="foto_url" name="foto_url">
+              <div>
+                <button type="button" onclick="cerrarModalEditar()" class="bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400">Cancelar</button>
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Actualizar</button>
+              </div>
+
+
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   </div>
 </div>

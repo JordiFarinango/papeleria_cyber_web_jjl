@@ -44,9 +44,49 @@ def nuevo_producto_admin(request):
 
 def ver_productos_admin(request):
     productos = Producto.objects.all()
+    marcas = Marca.objects.all()
+    categorias = Categoria.objects.all()
     return render(request, 'paginas_administrador/ver/ver_productos.html',{
+        'categorias': categorias,
+        'marcas': marcas,
         'productos': productos
     })
+
+def eliminar_producto(request):
+    producto_id = request.POST.get("id_producto")
+    producto_eli = get_object_or_404(Producto, id=producto_id)
+    producto_eli.delete()
+    return redirect('ver_productos_admin')
+
+def editar_producto(request):
+    id_producto = request.POST.get("id_producto_editar")
+    nombre = request.POST.get("nombre")
+    descripcion = request.POST.get("descripcion")
+    stock = request.POST.get("stock")
+    precio = request.POST.get("precio")
+    marca_id = request.POST.get("marca_id")
+    categoria_id = request.POST.get("categoria_id")
+    foto = request.FILES.get("foto_url")
+
+    if nombre:
+        producto = get_object_or_404(Producto, id=id_producto)
+        producto.nombre = nombre
+        producto.descripcion = descripcion
+        producto.stock = stock
+        producto.precio = precio
+
+        # 🔧 Aquí conviertes los IDs en instancias
+        if marca_id:
+            producto.marca = get_object_or_404(Marca, id=marca_id)
+        if categoria_id:
+            producto.categoria = get_object_or_404(Categoria, id=categoria_id)
+        # Solo actualiza la foto si se cargó una nueva
+        if foto:
+            producto.foto = foto
+        producto.save()
+        return redirect('ver_productos_admin')
+
+
 
 def ingresar_inventario_admin(request):
     productos = Producto.objects.all()

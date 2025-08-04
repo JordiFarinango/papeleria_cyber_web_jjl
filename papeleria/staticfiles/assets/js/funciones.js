@@ -241,3 +241,23 @@ function modalEditarProveedor(id, nombre, celular, ruc_cedula, direccion){
   document.getElementById("ruc_cedula").value = ruc_cedula;
   document.getElementById("direccion").value = direccion;
 }
+
+function modalEliminarProducto(id, nombre){
+  document.getElementById("id_producto").value = id;
+  document.getElementById("modalTextoProductoEli").textContent = `¿Está seguro de que desea eliminar el producto "${nombre}"`;
+  document.getElementById("modalEliminar").classList.remove("hidden");
+}
+
+function modalEditarProducto(id, nombre, marca_id, categoria_id, descripcion, precio, stock, foto_url){
+  document.getElementById("modalEditar").classList.remove("hidden");
+
+  document.getElementById("id_producto_editar").value= id
+  document.getElementById("nombre").value = nombre;
+  document.getElementById("marca_id").value = marca_id;
+  document.getElementById("categoria_id").value = categoria_id;
+  document.getElementById("descripcion").value = descripcion;
+  document.getElementById("precio").value = precio;
+  document.getElementById("stock").value = stock;
+  document.getElementById("preview_foto").src = foto_url;
+
+}

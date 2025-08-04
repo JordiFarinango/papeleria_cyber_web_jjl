@@ -1,11 +1,13 @@
 from django.urls import path
-from .views import inicio_admin, inicio, nuevo_producto_admin, ver_productos_admin, facturar_admin, usuarios_admin, ingresar_inventario_admin, marcas_admin, categorias_admin, nuevo_proveedor_admin, nuevo_cliente_admin, buscar_productos, filtrar_productos_por_categoria, actualizar_stock, eliminar_cliente, editar_cliente, eliminar_proveedor, editar_proveedor
+from .views import inicio_admin, inicio, nuevo_producto_admin, ver_productos_admin, facturar_admin, usuarios_admin, ingresar_inventario_admin, marcas_admin, categorias_admin, nuevo_proveedor_admin, nuevo_cliente_admin, buscar_productos, filtrar_productos_por_categoria, actualizar_stock, eliminar_cliente, editar_cliente, eliminar_proveedor, editar_proveedor, eliminar_producto, editar_producto
 
 urlpatterns = [
     path('', inicio, name="inicio"),
     path('inicio_admin/', inicio_admin, name='inicio_admin'),
     path('productos/', nuevo_producto_admin, name='nuevo_producto_admin'),
     path('ver_productos/', ver_productos_admin, name='ver_productos_admin'),
+    path('eliminar_producto', eliminar_producto, name='eliminar_producto'),
+    path('editar_producto', editar_producto, name="editar_producto"), 
     path('ingresar_inventario/', ingresar_inventario_admin, name='ingresar_inventario_admin'),
     path('marcas/', marcas_admin, name='marcas_admin'),
     path('categorias/', categorias_admin, name='categorias_admin'),
