@@ -7,6 +7,20 @@
   <h2>Agregar Nueva Categoria</h2>
 </div>
 
+{% if messages %}
+  <div class="mb-4">
+    {% for message in messages %}
+      <div class="p-3 rounded text-sm
+                  {% if message.tags == 'error' %} bg-red-100 text-red-700
+                  {% elif message.tags == 'success' %} bg-green-100 text-green-700
+                  {% else %} bg-gray-100 text-gray-700 {% endif %}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+
 <form method="POST">
   {% csrf_token %}
   
@@ -41,7 +55,13 @@
                 {% for categoria in categorias %}
                 <tr class="hover:bg-gray-50 border-b">
                     <td class="px-4 py-2">{{ categoria.nombre }}</td>
-                    <td class="px-4 py-2">Editar</td>
+                    <td>
+                    <button class="px-4 py-2" onclick="abrirModalEditarCategoria(
+                      '{{categoria.id}}',
+                      '{{categoria.nombre}}'
+                    )">
+                    Editar</button>
+                    </td>
                 </tr>
                 {% empty %}
                 <tr>
@@ -50,6 +70,24 @@
                 {% endfor %}
             </tbody>
         </table>
+
+        <div id="modalEditar" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center hidden z-50">
+          <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
+            <h2 class="text-lg font-semibold mb-4 text-gray-800">Editar Categoria</h2>
+            <form action="{% url 'editar_categoria' %}" method="POST">
+              {% csrf_token %}
+              <div class="grid grid-cols-1 gap-4 mb-4">
+              <input type="hidden" id="id_categoria" name="id_categoria">
+              <input type="text" id="nombre_cat" name="nombre_cat" class="border p-2 rounded w-full">
+              </div>
+              <div>
+                <button type="button" onclick="cerrarModalEditar()" class="bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400">Cancelar</button>
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Actualizar</button>
+              </div>
+            </form>
+          </div>
+
+        </div>
     </div>
 </div>
 

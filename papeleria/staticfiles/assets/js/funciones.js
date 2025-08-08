@@ -261,3 +261,19 @@ function modalEditarProducto(id, nombre, marca_id, categoria_id, descripcion, pr
   document.getElementById("preview_foto").src = foto_url;
 
 }
+
+function abrirModalEditarMarcas(id, nombre){
+  document.getElementById("modalEditar").classList.remove("hidden");
+
+  document.getElementById("marca_id").value = id;
+  document.getElementById("nombre").value = nombre;
+
+}
+
+function abrirModalEditarCategoria(id, nombre){
+  document.getElementById("modalEditar").classList.remove("hidden");
+
+  document.getElementById("id_categoria").value = id;
+  document.getElementById("nombre_cat").value = nombre;
+
+}

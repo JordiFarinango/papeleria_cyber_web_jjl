@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import inicio_admin, inicio, nuevo_producto_admin, ver_productos_admin, facturar_admin, usuarios_admin, ingresar_inventario_admin, marcas_admin, categorias_admin, nuevo_proveedor_admin, nuevo_cliente_admin, buscar_productos, filtrar_productos_por_categoria, actualizar_stock, eliminar_cliente, editar_cliente, eliminar_proveedor, editar_proveedor, eliminar_producto, editar_producto
+from .views import inicio_admin, inicio, nuevo_producto_admin, ver_productos_admin, facturar_admin, usuarios_admin, ingresar_inventario_admin, marcas_admin, categorias_admin, nuevo_proveedor_admin, nuevo_cliente_admin, buscar_productos, filtrar_productos_por_categoria, actualizar_stock, eliminar_cliente, editar_cliente, eliminar_proveedor, editar_proveedor, eliminar_producto, editar_producto, editar_marcas, editar_categoria
 
 urlpatterns = [
     path('', inicio, name="inicio"),
@@ -10,7 +10,9 @@ urlpatterns = [
     path('editar_producto', editar_producto, name="editar_producto"), 
     path('ingresar_inventario/', ingresar_inventario_admin, name='ingresar_inventario_admin'),
     path('marcas/', marcas_admin, name='marcas_admin'),
+    path('editar/marca/', editar_marcas, name='editar_marca'),
     path('categorias/', categorias_admin, name='categorias_admin'),
+    path('editar/categoria/', editar_categoria, name='editar_categoria'),
     path('nuevo_proveedor/', nuevo_proveedor_admin, name='nuevo_proveedor_admin'),
     path('nuevo_cliente/', nuevo_cliente_admin, name='nuevo_cliente_admin'),
     path('buscar_productos/', buscar_productos, name='buscar_productos'),

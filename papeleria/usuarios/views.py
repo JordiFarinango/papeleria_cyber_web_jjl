@@ -110,6 +110,16 @@ def marcas_admin(request):
         'marcas': marcas
     })
 
+def editar_marcas(request):
+    marca_id = request.POST.get("marca_id")
+    nombre = request.POST.get("nombre")
+
+    if nombre:
+        marca = get_object_or_404(Marca, id = marca_id)
+        marca.nombre = nombre
+        marca.save()
+        return redirect ("marcas_admin")
+
 def categorias_admin(request):
     categorias = Categoria.objects.all()
     if request.method == 'POST':
@@ -122,6 +132,21 @@ def categorias_admin(request):
     return render(request, 'paginas_administrador/agregar/categorias.html',{
         'categorias':categorias
     })
+
+def editar_categoria(request):
+    categoria_id = request.POST.get("id_categoria")
+    nombre = (request.POST.get("nombre_cat") or "").strip()
+
+    if not nombre:
+        messages.error(request, "El nombre no puede estar vacío.")
+        return redirect("categorias_admin")
+
+    categoria = get_object_or_404(Categoria, id=categoria_id)
+    categoria.nombre = nombre
+    categoria.save()
+    messages.success(request, "Categoría actualizada correctamente.")
+    return redirect("categorias_admin")
+
 
 def nuevo_proveedor_admin(request):
     proveedores = Proveedor.objects.all()
