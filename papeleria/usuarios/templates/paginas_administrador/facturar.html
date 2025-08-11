@@ -38,12 +38,74 @@
             </table>
         </div>
 
+        <!--Consumidor final o con datos-->
+        <div class="mt-4 space-y-3">
+            <label class="block text-sm text-gray-700">Tipo de Factura
+                <select id="tipo-comprador" class="ml-2 border rounded p-1">
+                    <option value="CF">Consumidor Final</option>
+                    <option value="CL">Factura (Con Datos)</option>
+                </select>
+            </label>
+
+            <button id="btn-abrir-cliente" class="hidden bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700">
+                Elegir / Crear Cliente
+            </button>
+
+            <div id="resumen-cliente" class="hidden text-sm text-gray-700">
+                Factura a nombre de: <span id="resumen-cliente-nombre" class="font-semibold"></span>
+            </div>
+        </div>
+
+
+        <div class="mt-4 text-right">
+        <button id="btn-cobrar" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+            Cobrar
+        </button>
+        </div>
+
         <!-- Total -->
         <div class="text-right text-lg font-bold text-gray-800">
             Total: $<span id="total-carrito">0.00</span>
         </div>
     </div>
 
+<!-- Modal Cliente -->
+<div id="modal-cliente" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+  <div class="bg-white w-full max-w-md rounded-lg p-5">
+    <h3 class="text-lg font-semibold mb-4">Datos del cliente</h3>
+
+    <div class="grid gap-3">
+      <label class="text-sm">Cédula / RUC
+        <input id="cli-cedula" type="text" class="w-full border rounded p-2" autocomplete="off">
+      </label>
+      <label class="text-sm">Nombre
+        <input id="cli-nombre" type="text" class="w-full border rounded p-2">
+      </label>
+      <label class="text-sm">Celular
+        <input id="cli-celular" type="text" class="w-full border rounded p-2">
+      </label>
+      <label class="text-sm">Dirección
+        <input id="cli-direccion" type="text" class="w-full border rounded p-2">
+      </label>
+      <label class="text-sm">Correo
+        <input id="cli-correo" type="email" class="w-full border rounded p-2">
+      </label>
+      <label class="text-sm">Provincia
+        <input id="cli-provincia" type="text" class="w-full border rounded p-2">
+      </label>
+    </div>
+
+    <div class="mt-5 flex justify-end gap-2">
+      <button id="btn-cliente-cancelar" class="px-3 py-1 rounded border">Cancelar</button>
+      <button id="btn-cliente-aceptar" class="px-3 py-1 rounded bg-blue-600 text-white">Aceptar</button>
+    </div>
+  </div>
 </div>
+
+
+</div>
+
+
+
 
 {% endblock %}

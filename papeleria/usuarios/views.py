@@ -232,6 +232,31 @@ def buscar_productos(request):
     html = render_to_string('fragmentos/productos_filtrados.html',{'productos': productos}) #productos filtrados
     return JsonResponse({'html': html}) #Json devuelve un diccionario convertido en JSON y puede ser leido desde javascript, para armar el div de resultado-productos
 
+@csrf_exempt
+def confirmar_venta(request):
+    if request.method != 'POST':
+        return JsonResponse({'ok': False, 'error': 'Método no permitido'}, status=405)
+    try:
+        data = json.loads(request.body)
+        items = data.get('items', [])
+
+        for item in items:
+            producto_id = item['id']
+            cantidad = int(item['cantidad'])
+
+            # Buscar producto y restar stock
+            producto = Producto.objects.get(id=producto_id)
+            if producto.stock < cantidad:
+                return JsonResponse({'ok': False, 'error': f'Sin stock para {producto.nombre}'})
+            
+            producto.stock -= cantidad
+            producto.save()
+
+        return JsonResponse({'ok': True})
+    except Exception as e:
+        return JsonResponse({'ok': False, 'error': str(e)})
+        
+
 
 def filtrar_productos_por_categoria(request, categoria_id):
     productos = Producto.objects.filter(categoria_id=categoria_id)
@@ -288,4 +313,22 @@ def editar_cliente(request):
         return redirect('nuevo_cliente_admin')
 
 
-    
+def buscar_cliente_cedula(request):
+    ced = request.GET.get('cedula', '').strip()
+    if not ced:
+        return JsonResponse({'found': False})
+    try:
+        cli = Cliente.objects.get(ruc_cedula=ced)
+        return JsonResponse({
+            'found': True,
+            'cliente': {
+                'id': cli.id,
+                'nombre': cli.nombre,
+                'celular': cli.celular,
+                'direccion': cli.direccion,
+                'correo': cli.correo,
+                'provincia': cli.provincia,
+            }
+        })
+    except Cliente.DoesNotExist:
+        return JsonResponse({'found': False})
