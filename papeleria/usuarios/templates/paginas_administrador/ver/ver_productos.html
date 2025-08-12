@@ -29,7 +29,7 @@
             <tr class="hover:bg-gray-50 transition">
               <td class="px-4 py-2">
                 {% if producto.foto %}
-                  <img src="{{ producto.foto.url }}" alt="Imagen de {{ producto.nombre }}" class="w-16 h-16 object-cover rounded-md">
+                  <img src="{{ producto.foto.url }}" alt="Imagen de {{ producto.nombre }}" class="w-16 h-16 object-cover rounded-md cursor-zoom-in" data-lightbox data-full="{{ producto.foto.url }}">
                 {% else %}
                   <span class="text-gray-400 italic">Sin imagen</span>
                 {% endif %}
@@ -122,6 +122,17 @@
           </form>
         </div>
       </div>
+
+            <!-- Lightbox Imagen -->
+      <div id="img-viewer" class="fixed inset-0 bg-gray-700/60 backdrop-blur-[1px] hidden z-[60]">
+        <div class="w-full h-full flex items-center justify-center p-4">
+          <img id="img-viewer-img"
+              src=""
+              alt="Vista previa"
+              class="max-w-[90vw] max-h-[90vh] rounded-xl shadow-2xl cursor-zoom-out" />
+        </div>
+      </div>
+
     </div>
   </div>
 </div>

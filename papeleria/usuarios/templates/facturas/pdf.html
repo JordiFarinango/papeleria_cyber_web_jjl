@@ -1,0 +1,90 @@
+<style>
+  @page { size: 70mm 1000mm; margin: 0; }
+  body {
+    font-family: monospace;
+    font-size: 9px;
+    padding: 5px;
+    line-height: 1.2;
+  }
+  .center { text-align: center; }
+  .right { text-align: right; }
+  .linea { border-top: 1px dashed #000; margin: 4px 0; }
+  table { width: 100%; border-collapse: collapse; }
+  td { vertical-align: top; }
+  td:nth-child(1) { width: 10%; }
+  td:nth-child(2) { width: 50%; }
+  td:nth-child(3), td:nth-child(4) { width: 20%; text-align: right; }
+
+  .bloque-cliente div {
+  margin: 0;
+  padding: 0;
+  line-height: 1; /* más pegado pero mantiene la fuente original */
+}
+
+.tabla-productos td {
+  padding: 0;
+  margin: 0;
+  line-height: 1; /* compacta filas */
+}
+
+.tabla-productos .descripcion {
+  max-width: 80px;  /* ajusta según el ancho de tu ticket */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+</style>
+
+<div class="center bold">Papelería Cyber Web J.J.L</div>
+<div class="center">CAYAMBE</div>
+<div class="center">R.U.C: 1713232724</div>
+<div class="center">Dir. Juan Montalvo calle Gran Colombia</div>
+<div class="center">RUC: 1713232724001</div>
+
+<div class="guiones">------------------------------------</div>
+
+Fecha: {{ factura.fecha|date:"d/m/Y H:i" }}  
+Factura Nº: 000-000-{{ factura.id|stringformat:"07d" }}
+
+<div class="guiones">------------------------------------</div>
+
+<div class="bloque-cliente">
+  <div>Cliente: {% if factura.cliente %}{{ factura.cliente.nombre }}{% else %}CONSUMIDOR FINAL{% endif %}</div>
+  <div>R.U.C: {% if factura.cliente %}{{ factura.cliente.ruc_cedula }}{% else %}9999999999999{% endif %}</div>
+  <div>Dirección: {% if factura.cliente %}{{ factura.cliente.direccion }}{% else %}XXXXXXX{% endif %}</div>
+  <div>Correo: {% if factura.cliente %}{{ factura.cliente.correo }}{% else %}XXXXXX{% endif %}</div>
+  <div>Celular: {% if factura.cliente %}{{ factura.cliente.celular }}{% else %}XXXXXX{% endif %}</div>
+  <div>Provincia: {% if factura.cliente %}{{ factura.cliente.provincia }}{% else %}XXXXXX{% endif %}</div>
+</div>
+
+<div class="guiones">------------------------------------</div>
+
+
+<table class="tabla-productos">
+  <tr>
+    <td>Cant</td>
+    <td>Descripción</td>
+    <td>Precio</td>
+    <td>Total</td>
+  </tr>
+  {% for d in detalles %}
+  <tr>
+    <td>{{ d.cantidad }}</td>
+    <td class="descripcion">{{ d.producto.nombre }}</td>
+    <td>{{ d.precio }}</td>
+    <td>{{ d.subtotal }}</td>
+  </tr>
+  {% endfor %}
+</table>
+
+
+<div class="guiones">------------------------------------</div>
+
+IVA 15%: {{ factura.iva }}  
+Total a Pagar: {{ factura.total }}
+
+<div class="guiones">------------------------------------</div>
+
+<div class="center">Gracias por su visita</div>
+<div class="center">Vuelva pronto</div>

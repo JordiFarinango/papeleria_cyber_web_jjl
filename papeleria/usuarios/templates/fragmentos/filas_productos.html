@@ -1,0 +1,44 @@
+{% load custom_filters %}
+{% if productos %}
+  {% for producto in productos %}
+  <tr class="hover:bg-gray-50 transition text-sm">
+    <td class="px-2 py-2">
+      {% if producto.foto %}
+        <img
+          src="{{ producto.foto.url }}"
+          alt="Imagen de {{ producto.nombre }}"
+          class="w-12 h-12 object-cover rounded cursor-zoom-in"
+          data-lightbox
+          data-full="{{ producto.foto.url }}" />
+      {% else %}
+        <span class="text-gray-400 italic">Sin imagen</span>
+      {% endif %}
+    </td>
+
+    <td class="px-2 py-2 font-semibold text-gray-900 truncate max-w-[160px]" title="{{ producto.nombre }}">
+      {{ producto.nombre }}
+    </td>
+
+    <td class="px-2 py-2">{{ producto.marca.nombre }}</td>
+    <td class="px-2 py-2">${{ producto.precio }}</td>
+    <td class="px-2 py-2">{{ producto.stock }}</td>
+
+    <td class="px-2 py-2">
+      <button
+        class="agregar-carrito bg-blue-600 text-white text-xs px-3 py-1 rounded-lg hover:bg-blue-700 transition"
+        data-id="{{ producto.id }}"
+        data-nombre="{{ producto.nombre }}"
+        data-marca="{{ producto.marca.nombre }}"
+        data-categoria="{{ producto.categoria.nombre }}"
+        data-precio="{{ producto.precio|decimal_point }}"
+        data-stock="{{ producto.stock }}">
+        Agregar
+      </button>
+    </td>
+  </tr>
+  {% endfor %}
+{% else %}
+  <tr>
+    <td colspan="6" class="px-2 py-4 text-center text-gray-500">Sin resultados</td>
+  </tr>
+{% endif %}

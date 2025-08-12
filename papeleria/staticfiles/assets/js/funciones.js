@@ -21,23 +21,23 @@ document.addEventListener('DOMContentLoaded', function () {
 /* el buscador de productos de facturar.html */
 document.addEventListener('DOMContentLoaded', function () {
   const inputBusqueda = document.getElementById('buscador-producto');
-  const resultadoDiv = document.getElementById('resultado-productos');
+  const tbody = document.getElementById('tabla-busqueda-body');
+  if (!inputBusqueda || !tbody) return;
 
-  if (inputBusqueda) {
-    inputBusqueda.addEventListener('input', function () {
-      const query = inputBusqueda.value;
+  inputBusqueda.addEventListener('input', function () {
+    const query = inputBusqueda.value;
 
-      fetch(`/buscar_productos/?q=${encodeURIComponent(query)}`)
-        .then(response => response.json())
-        .then(data => {
-          resultadoDiv.innerHTML = data.html;
-        })
-        .catch(error => {
-          console.error('Error en la búsqueda:', error);
-        });
-    });
-  }
+    fetch(`/buscar_productos/?q=${encodeURIComponent(query)}`)
+      .then(response => response.json())
+      .then(data => {
+        tbody.innerHTML = data.html; // reemplaza solo las filas
+      })
+      .catch(error => {
+        console.error('Error en la búsqueda:', error);
+      });
+  });
 });
+
 
 
 // carrito de compras
@@ -144,37 +144,49 @@ document.addEventListener('DOMContentLoaded', function () {
       const cantidad = parseInt(fila.dataset.cantidad, 10);
       const precio = parseFloat(fila.dataset.precio);
 
-      items.push({
-        id: id,
-        cantidad: cantidad,
-        precio: precio
-      });
+      items.push({ id, cantidad, precio });
     });
 
-    // 3️⃣ Mostramos en consola para verificar
+    // 3️⃣ Validación rápida
     console.log('📦 Items del carrito:', items);
     if (items.length === 0) {
       alert('El carrito está vacío.');
       return;
     }
 
+    // 4️⃣ Si es "Factura (Con Datos)", armamos el payload de cliente
+    const tipo = document.getElementById('tipo-comprador')?.value;
+    let cliente = null;
+    if (tipo === 'CL') {
+      cliente = {
+        cedula: document.getElementById('cli-cedula')?.value || '',
+        nombre: document.getElementById('cli-nombre')?.value || '',
+        celular: document.getElementById('cli-celular')?.value || '',
+        direccion: document.getElementById('cli-direccion')?.value || '',
+        correo: document.getElementById('cli-correo')?.value || '',
+        provincia: document.getElementById('cli-provincia')?.value || ''
+      };
+    }
+
+    // 5️⃣ Enviamos items (+ cliente si aplica)
     fetch('/facturar/confirmar/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'X-CSRFToken': getCookie('csrftoken'),
       },
-      body: JSON.stringify({ items })
+      body: JSON.stringify({ items, cliente }) // ← ahora mandamos cliente o null
     })
     .then(r => r.json())
     .then(data => {
       if (data.ok) {
-        
-        location.reload();
-        alert('Compra realizada con éxito.');
-        // limpiar carrito en UI
-        document.getElementById('cuerpo-carrito').innerHTML = '';
-        recalcularTotal();
+        // Abre el PDF (por ahora la vista de prueba con xhtml2pdf)
+        window.open(`/facturas/pdf/${data.factura_id}/`, '_blank');
+
+        // Recarga la página actual después de un instante
+        setTimeout(() => {
+          window.location.reload();
+        }, 400); // Ajusta a 700ms si tu navegador se demora
       } else {
         alert(data.error || 'No se pudo completar la compra.');
       }
@@ -471,4 +483,203 @@ document.addEventListener('DOMContentLoaded', function () {
     // Cerrar modal
     modal.classList.add('hidden');
   });
+});
+
+
+// Lightbox para imágenes de productos
+document.addEventListener('DOMContentLoaded', function () {
+  const viewer = document.getElementById('img-viewer');
+  const bigImg = document.getElementById('img-viewer-img');
+  if (!viewer || !bigImg) return;
+
+  function openViewer(src) {
+    bigImg.src = src;
+    viewer.classList.remove('hidden');
+    document.body.classList.add('overflow-hidden');
+  }
+  function closeViewer() {
+    viewer.classList.add('hidden');
+    bigImg.src = '';
+    document.body.classList.remove('overflow-hidden');
+  }
+
+  // Delegación: cualquier <img data-lightbox> dentro del documento
+  document.addEventListener('click', (e) => {
+    const thumb = e.target.closest('img[data-lightbox]');
+    if (thumb) {
+      const src = thumb.getAttribute('data-full') || thumb.src;
+      openViewer(src);
+      return;
+    }
+    // Cerrar si se hace clic en el overlay o en la imagen grande
+    if (!viewer.classList.contains('hidden') &&
+        (e.target === viewer || e.target === bigImg)) {
+      closeViewer();
+    }
+  });
+
+  // Cerrar con ESC
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !viewer.classList.contains('hidden')) {
+      closeViewer();
+    }
+  });
+});
+
+
+document.addEventListener("DOMContentLoaded", function () {
+  const selCat = document.getElementById("categoria-select");
+  const inpBuscar = document.getElementById("buscar-nombre");
+  const tbody = document.getElementById("tabla-productos");
+  const loteBody = document.getElementById("lote-body");
+  const loteVacio = document.getElementById("lote-vacio");
+  const btnGuardar = document.getElementById("btn-guardar-lote");
+
+  if (!selCat || !tbody) return;
+
+  // Estado del lote en memoria: [{producto_id, nombre, cantidad}]
+  let lote = [];
+
+  function renderLote() {
+    // limpiar
+    loteBody.innerHTML = "";
+
+    if (lote.length === 0) {
+      const tr = document.createElement("tr");
+      tr.id = "lote-vacio";
+      tr.innerHTML = `<td colspan="3" class="px-2 py-4 text-center text-gray-500">Aún no agregas nada</td>`;
+      loteBody.appendChild(tr);
+      btnGuardar.disabled = true;
+      return;
+    }
+
+    lote.forEach((it, idx) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td class="px-2 py-2">${it.nombre}</td>
+        <td class="px-2 py-2">
+          <input type="number" min="1" value="${it.cantidad}" data-idx="${idx}" class="lote-cant border rounded p-1 w-20">
+        </td>
+        <td class="px-2 py-2">
+          <button data-idx="${idx}" class="lote-remove text-red-600 hover:text-red-800">Quitar</button>
+        </td>`;
+      loteBody.appendChild(tr);
+    });
+    btnGuardar.disabled = false;
+  }
+
+  function cargarProductos() {
+    const cat = selCat.value;
+    if (!cat) {
+      tbody.innerHTML = `<tr><td colspan="4" class="px-2 py-3 text-gray-500">Selecciona una categoría</td></tr>`;
+      return;
+    }
+    const q = encodeURIComponent(inpBuscar.value || "");
+    fetch(`/filtrar_productos_por_categoria/${cat}/?q=${q}`)
+      .then(r => r.text())
+      .then(html => {
+        tbody.innerHTML = html;
+      })
+      .catch(err => {
+        console.error(err);
+        tbody.innerHTML = `<tr><td colspan="4" class="px-2 py-3 text-red-600">Error cargando productos</td></tr>`;
+      });
+  }
+
+  selCat.addEventListener("change", cargarProductos);
+  inpBuscar?.addEventListener("input", () => {
+    // si no hay categoría, no buscamos
+    if (!selCat.value) return;
+    cargarProductos();
+  });
+
+  // Agregar al lote (delegación)
+  document.addEventListener("click", function (e) {
+    if (e.target.classList.contains("btn-agregar-lote")) {
+      const tr = e.target.closest("tr");
+      const pid = tr.getAttribute("data-producto-id");
+      const nombre = tr.children[0].textContent.trim();
+      const input = tr.querySelector(".input-cantidad");
+      const cant = parseInt(input.value, 10);
+
+      if (!cant || cant <= 0) {
+        alert("Ingresa una cantidad válida");
+        return;
+      }
+
+      // si ya existe en el lote, suma
+      const idx = lote.findIndex(x => String(x.producto_id) === String(pid));
+      if (idx >= 0) {
+        lote[idx].cantidad += cant;
+      } else {
+        lote.push({ producto_id: pid, nombre, cantidad: cant });
+      }
+
+      // limpiar input y re-render
+      input.value = "";
+      renderLote();
+    }
+
+    // quitar del lote
+    if (e.target.classList.contains("lote-remove")) {
+      const idx = parseInt(e.target.getAttribute("data-idx"), 10);
+      lote.splice(idx, 1);
+      renderLote();
+    }
+  });
+
+  // Cambiar cantidades dentro del lote
+  document.addEventListener("input", function (e) {
+    if (e.target.classList.contains("lote-cant")) {
+      const idx = parseInt(e.target.getAttribute("data-idx"), 10);
+      let val = parseInt(e.target.value, 10);
+      if (!val || val <= 0) val = 1;
+      lote[idx].cantidad = val;
+    }
+  });
+
+  // Guardar lote (POST en batch)
+  btnGuardar.addEventListener("click", function () {
+    if (lote.length === 0) return;
+    fetch('/actualizar-stock-lote/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCookie('csrftoken'),
+      },
+      body: JSON.stringify({ items: lote })
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.exito) {
+        alert('Stock actualizado correctamente.');
+        // resetea lote y recarga listado
+        lote = [];
+        renderLote();
+        cargarProductos();
+      } else {
+        alert(data.error || 'No se pudo actualizar el stock.');
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      alert('Error de red al guardar el lote.');
+    });
+  });
+
+  // helper csrf (ya lo tienes, lo reutilizo)
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
 });

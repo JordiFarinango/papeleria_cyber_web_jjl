@@ -1,16 +1,18 @@
 {% for producto in productos %}
 <tr data-producto-id="{{ producto.id }}">
-    <td>{{ producto.nombre }}</td>
-    <td class="stock-actual">{{ producto.stock }}</td>
-    <td>
-        <input type="number" min="1" placeholder="Cantidad" class="input-cantidad">
-    </td>
-    <td>
-        <button class="btn-actualizar-stock">Añadir</button>
-    </td>
+  <td class="px-2 py-2">{{ producto.nombre }}</td>
+  <td class="px-2 py-2 stock-actual">{{ producto.stock }}</td>
+  <td class="px-2 py-2">
+    <input type="number" min="1" placeholder="Cantidad" class="input-cantidad border rounded p-1 w-24">
+  </td>
+  <td class="px-2 py-2">
+    <button class="btn-agregar-lote bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700">
+      Agregar al lote
+    </button>
+  </td>
 </tr>
 {% empty %}
 <tr>
-    <td colspan="4">No hay productos en esta categoría</td>
+  <td colspan="4" class="px-2 py-3 text-center text-gray-500">No hay productos</td>
 </tr>
 {% endfor %}
