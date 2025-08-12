@@ -446,3 +446,29 @@ document.addEventListener('DOMContentLoaded', function () {
       .catch(err => console.error('Error buscando cliente:', err));
   });
 });
+
+
+document.addEventListener('DOMContentLoaded', function () {
+  const btnAceptar = document.getElementById('btn-cliente-aceptar');
+  const modal = document.getElementById('modal-cliente');
+  const resumen = document.getElementById('resumen-cliente');
+  const resumenNombre = document.getElementById('resumen-cliente-nombre');
+  const inpNombre = document.getElementById('cli-nombre');
+
+  if (!btnAceptar || !modal || !resumen || !resumenNombre || !inpNombre) return;
+
+  btnAceptar.addEventListener('click', () => {
+    const nombre = inpNombre.value.trim();
+    if (!nombre) {
+      alert("Por favor, ingresa el nombre del cliente.");
+      return;
+    }
+
+    // Mostrar el resumen con el nombre
+    resumenNombre.textContent = nombre;
+    resumen.classList.remove('hidden');
+
+    // Cerrar modal
+    modal.classList.add('hidden');
+  });
+});
