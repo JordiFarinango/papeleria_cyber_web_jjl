@@ -31,7 +31,12 @@
         data-marca="{{ producto.marca.nombre }}"
         data-categoria="{{ producto.categoria.nombre }}"
         data-precio="{{ producto.precio|decimal_point }}"
-        data-stock="{{ producto.stock }}">
+        data-stock="{{ producto.stock }}"
+        {% if producto.promocion and producto.promocion.activo %}
+          data-promo-n="{{ producto.promocion.bundle_cantidad }}"
+          data-promo-precio="{{ producto.promocion.bundle_precio|decimal_point }}"
+        {% endif %}
+      >
         Agregar
       </button>
     </td>

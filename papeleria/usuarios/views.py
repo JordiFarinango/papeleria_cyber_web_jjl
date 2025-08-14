@@ -512,3 +512,7 @@ def actualizar_stock_lote(request):
         return JsonResponse({'exito': False, 'error': 'Producto no encontrado'})
     except Exception as e:
         return JsonResponse({'exito': False, 'error': str(e)})
+
+
+def historial_ventas(request):
+    return render(request, 'paginas_administrador/ver/historial_ventas.html')

@@ -34,11 +34,18 @@
           <span>Dashboard</span>
         </a>
 
-        <div class="uppercase text-xs font-semibold mb-3 select-none">Facturación</div>
-        <a href="{% url 'facturar_admin' %}" class="flex items-center space-x-3 py-2 rounded hover:bg-gray-100">
-          <i class="fa-solid fa-cart-shopping"></i>
-          <span>Facturar</span>
-        </a>
+
+      <div class="uppercase text-xs font-semibold mb-3 select-none">INVENTARIO</div>
+      <div id="btn-facturacion" class="flex items-center space-x-3 py-2 rounded hover:bg-gray-100 cursor-pointer">
+        <i class="fas fa-box"></i>
+        <span>Facturación</span>
+        <i class="fas fa-chevron-down ml-auto text-sm"></i>
+      </div>
+
+      <div id="submenu-facturacion" class="ml-6 mt-1 space-y-1 hidden">
+      <a href="{% url 'facturar_admin' %}" class="block py-1 text-sm hover:underline">Facturar</a>
+      <a href="{% url 'historial_ventas' %}" class="block py-1 text-sm hover:underline">Historial Compras</a>
+      </div>
 
       <div class="uppercase text-xs font-semibold mb-3 select-none">INVENTARIO</div>
       <div id="btn-productos" class="flex items-center space-x-3 py-2 rounded hover:bg-gray-100 cursor-pointer">

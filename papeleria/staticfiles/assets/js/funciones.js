@@ -3,7 +3,9 @@
 document.addEventListener('DOMContentLoaded', function () {
   const menus = [
     { boton: 'btn-productos', submenu: 'submenu-productos' },
-    { boton: 'btn-usuarios', submenu: 'submenu-usuarios' }
+    { boton: 'btn-usuarios', submenu: 'submenu-usuarios' },
+    { boton: 'btn-facturacion', submenu: 'submenu-facturacion' }
+
   ];
 
   menus.forEach(menu => {
@@ -38,11 +40,37 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 });
 
+function calcularConPromo(cantidad, precioUnit, promoN, promoPrecio) {
+  const pN = parseInt(promoN, 10);
+  const pF = parseFloat(promoPrecio);
+
+  if (!pN || !pF) {
+    return {
+      subtotal: cantidad * precioUnit,
+      texto: 'Ninguna'
+    };
+  }
+
+  const bundles = Math.floor(cantidad / pN);
+  const resto = cantidad % pN;
+
+  const subtotal = (bundles * pF) + (resto * precioUnit);
+
+  let texto = 'Ninguna';
+  if (bundles > 0) {
+    texto = `${pN}x$${pF.toFixed(2)} × ${bundles}`;
+    if (resto > 0) texto += ` + ${resto} sin promo`;
+  }
+
+  return { subtotal, texto };
+}
 
 
 // carrito de compras
+// carrito de compras (REEMPLAZA ESTE LISTENER COMPLETO)
 document.addEventListener('click', function (e) {
-if (e.target.classList.contains('agregar-carrito')) {
+  if (!e.target.classList.contains('agregar-carrito')) return;
+
   const boton = e.target;
   const id = boton.dataset.id;
   const nombre = boton.getAttribute('data-nombre');
@@ -50,6 +78,10 @@ if (e.target.classList.contains('agregar-carrito')) {
   const categoria = boton.getAttribute('data-categoria');
   const precio = parseFloat(boton.getAttribute('data-precio'));
   const stock = parseInt(boton.dataset.stock, 10);
+
+  // promo (si existe en el botón)
+  const promoN = boton.getAttribute('data-promo-n') || '';
+  const promoPrecio = boton.getAttribute('data-promo-precio') || '';
 
   const nombreCompleto = `${nombre} (${marca} - ${categoria})`;
 
@@ -59,6 +91,7 @@ if (e.target.classList.contains('agregar-carrito')) {
   filas.forEach(fila => {
     const celdaNombre = fila.querySelector('td');
     if (celdaNombre && celdaNombre.textContent === nombreCompleto) {
+      // Ya existe en el carrito → incrementamos
       const celdaCantidad = fila.children[1];
       let cantidadActual = parseInt(celdaCantidad.textContent);
 
@@ -70,15 +103,27 @@ if (e.target.classList.contains('agregar-carrito')) {
 
       cantidadActual += 1;
       celdaCantidad.textContent = cantidadActual;
-
-      // 🆕 guarda también la cantidad en dataset (sin cambiar tu HTML)
       fila.dataset.cantidad = String(cantidadActual);
 
-      const celdaSubtotal = fila.children[3];
-      celdaSubtotal.classList.add('subtotal'); // por si acaso
-      celdaSubtotal.textContent = `$${(cantidadActual * precio).toFixed(2)}`;
+      // leer promo guardada en la fila (si no tenía, queda vacía)
+      const filaPromoN = fila.dataset.promoN || '';
+      const filaPromoPrecio = fila.dataset.promoPrecio || '';
 
-      // 🆕 guarda datos clave en la fila (id/precio/stock)
+      const { subtotal, texto } = calcularConPromo(
+        cantidadActual,
+        precio,
+        filaPromoN,
+        filaPromoPrecio
+      );
+
+      const celdaPromo = fila.children[2];
+      celdaPromo.textContent = texto || 'Ninguna';
+
+      const celdaSubtotal = fila.children[3];
+      celdaSubtotal.classList.add('subtotal');
+      celdaSubtotal.textContent = `$${subtotal.toFixed(2)}`;
+
+      // asegurar datasets clave
       fila.classList.add('carrito-item');
       fila.dataset.id = id;
       fila.dataset.precio = String(precio);
@@ -94,26 +139,28 @@ if (e.target.classList.contains('agregar-carrito')) {
       return;
     }
 
+    // NUEVA FILA con promo aplicada si corresponde
+    const { subtotal, texto } = calcularConPromo(1, precio, promoN, promoPrecio);
+
     const nuevaFila = document.createElement('tr');
-    // 🆕 marca la fila y guarda datos
     nuevaFila.classList.add('carrito-item');
     nuevaFila.dataset.id = id;
     nuevaFila.dataset.precio = String(precio);
     nuevaFila.dataset.stock = String(stock);
     nuevaFila.dataset.cantidad = '1';
+    if (promoN) nuevaFila.dataset.promoN = String(promoN);
+    if (promoPrecio) nuevaFila.dataset.promoPrecio = String(promoPrecio);
 
     nuevaFila.innerHTML = `
       <td class="p-2 border">${nombreCompleto}</td>
       <td class="p-2 border">1</td>
-      <td class="p-2 border">Ninguna</td>
-      <td class="p-2 border subtotal">$${precio.toFixed(2)}</td>
+      <td class="p-2 border">${texto || 'Ninguna'}</td>
+      <td class="p-2 border subtotal">$${subtotal.toFixed(2)}</td>
     `;
     document.getElementById('cuerpo-carrito').appendChild(nuevaFila);
   }
 
   recalcularTotal();
-}
-
 });
 
 function recalcularTotal() {
