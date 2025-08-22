@@ -364,53 +364,35 @@ def buscar_cliente_cedula(request):
     
 
 
-def prueba_pdf(request):
-    html = """
-    <html>
-    <head>
-      <style>
-        @page { size: 70mm 500mm; margin: 0; }
-        body { font-family: Arial, sans-serif; font-size: 10px; padding: 6px; }
-        h1 { font-size: 12px; margin: 0 0 6px 0; }
-        .linea { border-top: 1px dashed #666; margin: 6px 0; }
-      </style>
-    </head>
-    <body>
-      <h1>Factura de prueba</h1>
-      <div>Fecha: 2025-08-12</div>
-      <div class="linea"></div>
-      <div>Producto A x2 — $4.00</div>
-      <div>Producto B x1 — $2.50</div>
-      <div class="linea"></div>
-      <strong>Total: $6.50</strong>
-    </body>
-    </html>
-    """
-    result = BytesIO()
-    pisa.CreatePDF(src=html, dest=result)
-    pdf = result.getvalue()
-    resp = HttpResponse(pdf, content_type="application/pdf")
-    resp["Content-Disposition"] = 'inline; filename="prueba.pdf"'
-    return resp
 
+from django.http import FileResponse
+from django.core.files.base import ContentFile
 
 def factura_pdf(request, factura_id):
     factura = get_object_or_404(Factura, id=factura_id)
-    detalles = factura.detalles.select_related('producto').all()  # related_name='detalles'
 
+    # 1) Si ya existe el PDF sellado, lo servimos y listo.
+    if factura.pdf_archivo:
+        return FileResponse(factura.pdf_archivo.open('rb'), content_type='application/pdf')
+
+    # 2) Generar por única vez con tu template actual.
+    detalles = factura.detalles.select_related('producto').all()
     html = render_to_string('facturas/pdf.html', {
         'factura': factura,
         'detalles': detalles,
-        'establecimiento': 'Papelería Mi Negocio',  # cámbialo si quieres leer de settings
+        'establecimiento': 'Papelería Mi Negocio',
     })
 
     result = BytesIO()
     pisa.CreatePDF(src=html, dest=result)
     pdf = result.getvalue()
 
-    resp = HttpResponse(pdf, content_type='application/pdf')
-    resp['Content-Disposition'] = f'inline; filename="factura_{factura.id}.pdf"'
-    return resp
+    # 3) Guardar “sellado” en la factura y devolverlo.
+    nombre_pdf = f'factura_{factura.id}.pdf'
+    factura.pdf_archivo.save(nombre_pdf, ContentFile(pdf))
+    factura.save()
+
+    return FileResponse(BytesIO(pdf), content_type='application/pdf')
 
 @csrf_exempt
 def confirmar_venta(request):

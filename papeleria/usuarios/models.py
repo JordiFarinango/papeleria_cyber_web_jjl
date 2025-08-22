@@ -57,6 +57,8 @@ class Factura(models.Model):
     cliente = models.ForeignKey(Cliente, null=True, blank=True, on_delete=models.SET_NULL)
     fecha = models.DateTimeField(default=timezone.now)
     total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    pdf_archivo = models.FileField(upload_to='facturas_pdf/', blank=True, null=True)  # 👈 nuevo
+
 
     def __str__(self):
         return f"Factura #{self.id} - {self.fecha:%Y-%m-%d}"
