@@ -20,6 +20,10 @@ from django.http import HttpResponse
 from xhtml2pdf import pisa
 from io import BytesIO
 
+from openpyxl import Workbook
+from openpyxl.styles import Font, Alignment
+from openpyxl.utils import get_column_letter
+
 SEARCH_LIMIT = 8
 
 #pagina antes del login
@@ -580,4 +584,60 @@ def eliminar_venta(request, factura_id):
     return redirect("historial_ventas")
 
 
+def exportar_productos_excel(request):
+    # Traer TODOS los productos (sin filtros/paginación)
+    productos = (
+        Producto.objects
+        .select_related("marca", "categoria")
+        .all()
+        .order_by("nombre")
+    )
 
+    # Definir columnas EXACTAS (en orden)
+    columnas = ["Nombre", "Marca", "Categoría", "Descripción", "Precio", "Stock"]
+
+    # Crear workbook/hoja
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Productos"
+
+    # Encabezados con formato
+    header_font = Font(bold=True)
+    align_center = Alignment(horizontal="center", vertical="center")
+
+    for col_idx, titulo in enumerate(columnas, start=1):
+        c = ws.cell(row=1, column=col_idx, value=titulo)
+        c.font = header_font
+        c.alignment = align_center
+        ws.column_dimensions[get_column_letter(col_idx)].width = max(12, len(titulo) + 2)
+
+    # Escribir filas
+    fila = 2
+    for p in productos.iterator(chunk_size=1000):
+        ws.cell(row=fila, column=1, value=p.nombre or "")
+        ws.cell(row=fila, column=2, value=getattr(p.marca, "nombre", "") or "")
+        ws.cell(row=fila, column=3, value=getattr(p.categoria, "nombre", "") or "")
+        ws.cell(row=fila, column=4, value=p.descripcion or "")
+        ws.cell(row=fila, column=5, value=float(p.precio) if p.precio is not None else None)
+        ws.cell(row=fila, column=6, value=int(p.stock) if p.stock is not None else None)
+        fila += 1
+
+    # Formatos numéricos
+    for r in range(2, fila):
+        ws.cell(row=r, column=5).number_format = '#,##0.00'  # Precio
+        ws.cell(row=r, column=6).number_format = '0'         # Stock
+
+    # Preparar respuesta como archivo descargable
+    now = timezone.localtime()
+    filename = f"productos_{now.strftime('%Y-%m-%d_%H-%M')}.xlsx"
+
+    output = BytesIO()
+    wb.save(output)
+    output.seek(0)
+
+    resp = HttpResponse(
+        output.read(),
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
+    resp["Content-Disposition"] = f"attachment; filename*=UTF-8''{filename}"
+    return resp

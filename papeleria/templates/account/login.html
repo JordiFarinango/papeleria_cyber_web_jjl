@@ -1,0 +1,105 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Iniciar sesión</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap");
+      body { font-family: "Inter", sans-serif; }
+    </style>
+  </head>
+
+  <body class="bg-[#0f172a] min-h-screen flex items-center justify-center px-4">
+    <main class="w-full max-w-md text-center">
+
+
+      <!-- Logo / título -->
+      <img src="logos/s1-spoilers-arcane-art-eye-studies-jinx-and-powder-v0-xbkp9uc3uwha1.jpg"
+           alt="Logo" class="mx-auto mb-6" width="40" height="40" loading="lazy" decoding="async">
+      <h1 class="text-white font-semibold text-lg mb-6">Inicia sesión en tu cuenta</h1>
+
+      <!-- Mensajes de Django -->
+      {% if messages %}
+        <div class="mb-4 text-left space-y-2">
+          {% for message in messages %}
+            <div class="text-sm px-3 py-2 rounded bg-slate-800 text-slate-200">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <!-- Errores no-campo -->
+      {% if form.non_field_errors %}
+        <div class="mb-4 text-left text-sm px-3 py-2 rounded bg-red-600/20 text-red-200">
+          {% for e in form.non_field_errors %}{{ e }}{% if not forloop.last %}<br>{% endif %}{% endfor %}
+        </div>
+      {% endif %}
+
+      <!-- Formulario Allauth -->
+      <form method="post" action="{% url 'account_login' %}" class="space-y-4 text-left">
+        {% csrf_token %}
+
+        <!-- Campo: login (usuario o email) -->
+        <div>
+          <label for="id_login" class="block text-sm text-[#94a3b8] mb-1">Usuario o correo</label>
+          <input id="id_login" name="login" type="text" autocomplete="username"
+                 placeholder="Tu usuario o correo"
+                 class="w-full rounded-md border border-[#1e293b] bg-[#0f172a] px-4 py-2 text-[#cbd5e1] placeholder-[#475569] focus:outline-none focus:ring-2 focus:ring-[#5c6ac4]"/>
+          {% if form.login.errors %}
+            <p class="mt-1 text-xs text-red-300">
+              {% for e in form.login.errors %}{{ e }}{% if not forloop.last %}<br>{% endif %}{% endfor %}
+            </p>
+          {% endif %}
+        </div>
+
+        <!-- Campo: password -->
+        <div>
+          <div class="flex items-center justify-between">
+            <label for="id_password" class="block text-sm text-[#94a3b8] mb-1">Contraseña</label>
+            <a href="{% url 'account_reset_password' %}" class="text-xs text-[#5c6ac4] font-semibold hover:underline">
+              ¿Ha olvidado tu contraseña?
+            </a>
+          </div>
+          <input id="id_password" name="password" type="password" autocomplete="current-password"
+                 placeholder="Tu contraseña"
+                 class="w-full rounded-md border border-[#1e293b] bg-[#0f172a] px-4 py-2 text-[#cbd5e1] placeholder-[#475569] focus:outline-none focus:ring-2 focus:ring-[#5c6ac4]"/>
+          {% if form.password.errors %}
+            <p class="mt-1 text-xs text-red-300">
+              {% for e in form.password.errors %}{{ e }}{% if not forloop.last %}<br>{% endif %}{% endfor %}
+            </p>
+          {% endif %}
+        </div>
+
+        <!-- Recordarme -->
+        <div class="flex justify-between items-center text-sm text-[#94a3b8]">
+          <label class="flex items-center space-x-2">
+            <input id="id_remember" name="remember" type="checkbox"
+                   class="w-4 h-4 rounded border border-[#475569] bg-[#0f172a] text-[#5c6ac4] focus:ring-[#5c6ac4]">
+            <span class="text-white font-medium">Recordarme</span>
+          </label>
+        </div>
+
+        <!-- Redirect (Allauth lo usa si viene en el contexto) -->
+        {% if redirect_field_value %}
+          <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
+        {% endif %}
+
+        <!-- Botón -->
+        <button type="submit"
+                class="w-full bg-[#5c6ac4] text-white font-semibold rounded-md py-2 mt-2 hover:bg-[#4a54b1] transition-colors">
+          Iniciar sesión
+        </button>
+      </form>
+
+      <!-- CTA inferior 
+      <p type="" class="mt-6 text-[#94a3b8] text-sm">
+        ¿Aún no tienes cuenta?
+        <a href="{% url 'account_signup' %}" class="text-[#5c6ac4] font-semibold hover:underline">Regístrate</a>
+      </p>
+      -->
+    </main>
+  </body>
+</html>
