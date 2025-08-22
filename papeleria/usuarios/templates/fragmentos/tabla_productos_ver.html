@@ -1,0 +1,45 @@
+{% load custom_filters %}
+
+{% for producto in productos %}
+<tr class="hover:bg-gray-50 transition">
+  <td class="px-4 py-2">
+    {% if producto.foto %}
+      <img src="{{ producto.foto.url }}" class="w-16 h-16 object-cover rounded-md">
+    {% else %}
+      <span class="text-gray-400 italic">Sin imagen</span>
+    {% endif %}
+  </td>
+  <td class="px-4 py-2 font-semibold">{{ producto.nombre }}</td>
+  <td class="px-4 py-2">{{ producto.marca.nombre }}</td>
+  <td class="px-4 py-2">{{ producto.categoria.nombre }}</td>
+  <td class="px-4 py-2 max-w-[100px] truncate" title="{{ producto.descripcion }}">
+    {{ producto.descripcion }}
+  </td>
+  <td class="px-4 py-2">${{ producto.precio }}</td>
+  <td class="px-4 py-2">{{ producto.stock }}</td>
+
+  <!-- 🔹 Aquí van los botones de acción -->
+  <td class="px-4 py-2">
+    <div>
+      <button class="fa-solid fa-pen-to-square text-blue-600 hover:text-blue-800 cursor-pointer" 
+        onclick="modalEditarProducto(
+          '{{producto.id}}',
+          '{{producto.nombre}}',
+          '{{producto.marca.id}}',
+          '{{producto.categoria.id}}',
+          '{{producto.descripcion}}',
+          '{{producto.precio|decimal_point}}',
+          '{{producto.stock}}',
+          '{% if producto.foto %}{{ producto.foto.url }}{% endif %}'
+        )"></button>
+
+      <button class="fa-solid fa-trash text-red-600 hover:text-red-800 cursor-pointer" 
+        onclick="modalEliminarProducto('{{producto.id}}', '{{producto.nombre}}')"></button>
+    </div>
+  </td>
+</tr>
+{% empty %}
+<tr>
+  <td colspan="8" class="px-4 py-4 text-center text-gray-500">No hay productos registrados.</td>
+</tr>
+{% endfor %}

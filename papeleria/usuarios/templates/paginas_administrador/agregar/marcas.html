@@ -60,7 +60,7 @@
         <form action="{% url 'editar_marca' %}" method="POST">
           {% csrf_token %}
           <div class="grid grid-cols-1 gap-4 mb-4">
-          <input type="" id="marca_id" name="marca_id">
+          <input type="hidden" id="marca_id" name="marca_id">
           <input type="text" name="nombre" id="nombre" class="border p-2 rounded w-full" required>
           </div>
           <div>

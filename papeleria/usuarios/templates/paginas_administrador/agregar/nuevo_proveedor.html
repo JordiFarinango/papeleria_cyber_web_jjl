@@ -116,7 +116,7 @@
         <form action="{% url 'editar_proveedor' %}" method="POST" id="formEditarProveedor">
             {% csrf_token %}
             <div class="grid grid-cols-1 gap-4 mb-4">
-                <input type="" id="id_proveedor_eli" name="id_proveedor_eli">
+                <input type="hidden" id="id_proveedor_eli" name="id_proveedor_eli">
                 <input type="text" id="nombre" name="nombre" class="border p-2 rounded w-full">
                 <input type="text" id="celular" name="celular" class="border p-2 rounded w-full">
                 <input type="text" id="ruc_cedula" name="ruc_cedula" class="border p-2 rounded w-full">

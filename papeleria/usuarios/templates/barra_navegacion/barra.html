@@ -78,6 +78,17 @@
 
       </div>
 
+      <div class="uppercase text-xs font-semibold mb-3 select-none">EXTRAS</div>
+      <div id="btn-extras" class="flex items-center space-x-3 py-2 rounded hover:bg-gray-100 cursor-pointer">
+        <i class="fas fa-box"></i>
+        <span>Extras</span>
+        <i class="fas fa-chevron-down ml-auto text-sm"></i>
+      </div>
+
+      <div id="submenu-extras" class="ml-6 mt-1 space-y-1 hidden">
+      <a href="" class="block py-1 text-sm hover:underline">Crear Ofertas</a>
+      </div>
+
 
         <hr class="my-4 border-t border-black opacity-60"/>
 
@@ -94,5 +105,136 @@
     </main>
   </div>
 <script src="{% static 'assets/js/funciones.js' %}"></script>
+
+{# --- Contenedor de toasts (arriba-derecha) --- #}
+<div id="toast-container" class="fixed top-4 right-4 z-[1000] space-y-3 w-[92vw] max-w-sm pointer-events-none">
+  {% if messages %}
+    {% for message in messages %}
+      <div
+        class="toast opacity-0 translate-y-2 transition-all duration-200 pointer-events-auto rounded-xl shadow-lg p-4 flex items-start gap-3 text-white border"
+        data-level="{{ message.tags|default:'info' }}"
+        data-text="{{ message|escape }}"
+      >
+        <!-- El contenido real se arma por JS con estilos según nivel -->
+      </div>
+    {% endfor %}
+  {% endif %}
+</div>
+
+<script>
+  (function () {
+    const AUTO_CLOSE_MS = 5000;              // 5 segundos
+    const MAX_VISIBLE = 3;                   // máximo toasts visibles
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+
+    // Mapa de estilos por nivel
+    const STYLE = {
+      success: { bg: 'bg-green-600', border: 'border-green-700', icon: '✓', role: 'status', sticky: false },
+      info:    { bg: 'bg-blue-600',  border: 'border-blue-700',  icon: 'ℹ', role: 'status', sticky: false },
+      warning: { bg: 'bg-amber-600', border: 'border-amber-700', icon: '!', role: 'status', sticky: false },
+      error:   { bg: 'bg-red-600',   border: 'border-red-700',   icon: '⚠', role: 'alert',  sticky: true  },
+    };
+
+    function normalizeLevel(tags) {
+      // 'message.tags' puede venir como 'success', 'error', 'info', 'warning' o con extras (e.g., 'success safe')
+      if (!tags) return 'info';
+      const parts = String(tags).split(/\s+/);
+      for (const p of parts) {
+        if (STYLE[p]) return p;
+      }
+      return 'info';
+    }
+
+    function trimStack() {
+      const toasts = container.querySelectorAll('.toast');
+      if (toasts.length > MAX_VISIBLE) {
+        for (let i = 0; i < toasts.length - MAX_VISIBLE; i++) {
+          toasts[i].remove();
+        }
+      }
+    }
+
+    function attachBehavior(toast, cfg) {
+      // Construir contenido interno según estilo
+      const text = toast.getAttribute('data-text') || '';
+      toast.setAttribute('role', cfg.role);
+      toast.setAttribute('aria-live', cfg.role === 'alert' ? 'assertive' : 'polite');
+
+      toast.classList.add(cfg.bg, cfg.border);
+      toast.innerHTML = `
+        <div class="text-xl leading-none">${cfg.icon}</div>
+        <div class="flex-1 text-sm">${text}</div>
+        <button type="button"
+          class="toast-close ml-2 shrink-0 rounded-md focus:outline-none focus:ring-2 focus:ring-white/60 px-2"
+          aria-label="Cerrar"
+        >×</button>
+      `;
+
+      // Animar entrada
+      requestAnimationFrame(() => {
+        toast.classList.remove('opacity-0', 'translate-y-2');
+      });
+
+      // Temporizador (pausable)
+      let timeoutId = null;
+      const isSticky = cfg.sticky;
+      const startTimer = () => {
+        if (isSticky) return;
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => closeToast(), AUTO_CLOSE_MS);
+      };
+      const stopTimer = () => clearTimeout(timeoutId);
+
+      function closeToast() {
+        stopTimer();
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 180);
+      }
+
+      // Iniciar temporizador
+      startTimer();
+
+      // Pausar en hover / reanudar al salir
+      toast.addEventListener('mouseenter', stopTimer);
+      toast.addEventListener('mouseleave', startTimer);
+
+      // Botón cerrar
+      const btn = toast.querySelector('.toast-close');
+      btn.addEventListener('click', closeToast);
+
+      // Accesibilidad
+      toast.setAttribute('tabindex', '0');
+
+      // Limitar stack
+      trimStack();
+    }
+
+    // Inicializar toasts renderizados por Django messages
+    container.querySelectorAll('.toast').forEach((toast) => {
+      const level = normalizeLevel(toast.getAttribute('data-level'));
+      const cfg = STYLE[level] || STYLE.info;
+      attachBehavior(toast, cfg);
+    });
+
+    // API global para usar en AJAX/Fetch en el futuro
+    window.toaster = {
+      show(level, text, opts = {}) {
+        const cfgBase = STYLE[level] || STYLE.info;
+        const cfg = { ...cfgBase, sticky: opts.sticky ?? cfgBase.sticky };
+
+        const div = document.createElement('div');
+        div.className = 'toast opacity-0 translate-y-2 transition-all duration-200 pointer-events-auto rounded-xl shadow-lg p-4 flex items-start gap-3 text-white border';
+        div.setAttribute('data-level', level);
+        div.setAttribute('data-text', text);
+        container.appendChild(div);
+        attachBehavior(div, cfg);
+      }
+    };
+  })();
+</script>
+
+
+
 </body>
 </html>

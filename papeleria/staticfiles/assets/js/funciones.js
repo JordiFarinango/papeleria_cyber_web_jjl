@@ -4,7 +4,9 @@ document.addEventListener('DOMContentLoaded', function () {
   const menus = [
     { boton: 'btn-productos', submenu: 'submenu-productos' },
     { boton: 'btn-usuarios', submenu: 'submenu-usuarios' },
-    { boton: 'btn-facturacion', submenu: 'submenu-facturacion' }
+    { boton: 'btn-facturacion', submenu: 'submenu-facturacion' },
+    { boton: 'btn-extras', submenu: 'submenu-extras' },
+
 
   ];
 
@@ -133,6 +135,7 @@ document.addEventListener('click', function (e) {
     }
   });
 
+// ---- cuando agregas un producto nuevo al carrito ----
   if (!productoEncontrado) {
     if (stock <= 0) {
       alert("No hay stock disponible.");
@@ -156,12 +159,57 @@ document.addEventListener('click', function (e) {
       <td class="p-2 border">1</td>
       <td class="p-2 border">${texto || 'Ninguna'}</td>
       <td class="p-2 border subtotal">$${subtotal.toFixed(2)}</td>
+      <td class="p-2 border text-center">
+        <button type="button" 
+          class="carrito-eliminar bg-red-600 hover:bg-red-700 text-white text-xs font-semibold px-3 py-1 rounded-full transition">
+          Eliminar
+        </button>
+      </td>
     `;
+
+
     document.getElementById('cuerpo-carrito').appendChild(nuevaFila);
   }
 
+
   recalcularTotal();
 });
+
+// ---- eliminar de 1 en 1 ----
+document.addEventListener('click', function (e) {
+  if (!e.target.classList.contains('carrito-eliminar')) return;
+
+  const fila = e.target.closest('tr');
+  const celdaCantidad = fila.children[1];
+  const celdaPromo = fila.children[2];
+  const celdaSubtotal = fila.children[3];
+
+  let cantidad = parseInt(fila.dataset.cantidad, 10);
+
+  cantidad -= 1;
+
+  if (cantidad <= 0) {
+    fila.remove();
+    recalcularTotal();
+    return;
+  }
+
+  // actualizar fila
+  fila.dataset.cantidad = String(cantidad);
+  celdaCantidad.textContent = cantidad;
+
+  const precio = parseFloat(fila.dataset.precio);
+  const promoN = fila.dataset.promoN || '';
+  const promoPrecio = fila.dataset.promoPrecio || '';
+
+  const { subtotal, texto } = calcularConPromo(cantidad, precio, promoN, promoPrecio);
+
+  celdaPromo.textContent = texto || 'Ninguna';
+  celdaSubtotal.textContent = `$${subtotal.toFixed(2)}`;
+
+  recalcularTotal();
+});
+
 
 function recalcularTotal() {
   let total = 0;
@@ -685,9 +733,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  // Guardar lote (POST en batch)
   btnGuardar.addEventListener("click", function () {
     if (lote.length === 0) return;
+
     fetch('/actualizar-stock-lote/', {
       method: 'POST',
       headers: {
@@ -698,21 +746,18 @@ document.addEventListener("DOMContentLoaded", function () {
     })
     .then(r => r.json())
     .then(data => {
-      if (data.exito) {
-        alert('Stock actualizado correctamente.');
-        // resetea lote y recarga listado
-        lote = [];
-        renderLote();
-        cargarProductos();
-      } else {
-        alert(data.error || 'No se pudo actualizar el stock.');
-      }
+      // ✅ La vista ya puso messages.success/error en sesión.
+      // Solo recargamos para que el toast aparezca en la nueva carga.
+      window.location.reload();
     })
     .catch(err => {
       console.error(err);
-      alert('Error de red al guardar el lote.');
+      // Si hubo un error de red (ni siquiera llegó al servidor),
+      // mostramos un toast inmediato (no habrá mensaje en sesión).
+      window.toaster?.show('error', 'Error de red al guardar el lote.');
     });
   });
+
 
   // helper csrf (ya lo tienes, lo reutilizo)
   function getCookie(name) {
@@ -730,3 +775,38 @@ document.addEventListener("DOMContentLoaded", function () {
     return cookieValue;
   }
 });
+
+
+document.addEventListener("DOMContentLoaded", function () {
+  const selCat = document.getElementById("categoria-select-ver");
+  const inpBuscar = document.getElementById("buscar-nombre-ver");
+  const tbody = document.getElementById("tabla-productos-ver");
+
+  if (!selCat || !tbody) return;
+
+  function cargarProductos() {
+    const cat = selCat.value;
+    const q = encodeURIComponent(inpBuscar.value || "");
+
+    // si no seleccionó categoría ni buscó nada
+    if (!cat && !q) {
+      tbody.innerHTML = `<tr><td colspan="8" class="px-4 py-3 text-gray-500">Selecciona una categoría o busca un producto</td></tr>`;
+      return;
+    }
+
+    fetch(`/filtrar_productos_ver/?cat=${cat}&q=${q}`)
+      .then(r => r.text())
+      .then(html => {
+        tbody.innerHTML = html;
+      })
+      .catch(err => {
+        console.error(err);
+        tbody.innerHTML = `<tr><td colspan="8" class="px-4 py-3 text-red-600">Error cargando productos</td></tr>`;
+      });
+  }
+
+  selCat.addEventListener("change", cargarProductos);
+  inpBuscar.addEventListener("input", cargarProductos);
+});
+
+

@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import inicio_admin, inicio, nuevo_producto_admin, ver_productos_admin, facturar_admin, usuarios_admin, ingresar_inventario_admin, marcas_admin, categorias_admin, nuevo_proveedor_admin, nuevo_cliente_admin, buscar_productos, filtrar_productos_por_categoria, actualizar_stock, eliminar_cliente, editar_cliente, eliminar_proveedor, editar_proveedor, eliminar_producto, editar_producto, editar_marcas, editar_categoria, confirmar_venta, buscar_cliente_cedula, prueba_pdf, factura_pdf, actualizar_stock_lote, historial_ventas
+from .views import inicio_admin, inicio, nuevo_producto_admin, ver_productos_admin, facturar_admin, usuarios_admin, ingresar_inventario_admin, marcas_admin, categorias_admin, nuevo_proveedor_admin, nuevo_cliente_admin, buscar_productos, filtrar_productos_por_categoria, actualizar_stock, eliminar_cliente, editar_cliente, eliminar_proveedor, editar_proveedor, eliminar_producto, editar_producto, editar_marcas, editar_categoria, confirmar_venta, buscar_cliente_cedula, prueba_pdf, factura_pdf, actualizar_stock_lote, historial_ventas, factura_pdf_historial, eliminar_venta, filtrar_productos_ver
 
 urlpatterns = [
     path('', inicio, name="inicio"),
@@ -18,6 +18,7 @@ urlpatterns = [
     path('nuevo_proveedor/', nuevo_proveedor_admin, name='nuevo_proveedor_admin'),
     path('nuevo_cliente/', nuevo_cliente_admin, name='nuevo_cliente_admin'),
     path('buscar_productos/', buscar_productos, name='buscar_productos'),
+    path('filtrar_productos_ver/', filtrar_productos_ver, name='filtrar_productos_ver'),
 
     path('actualizar-stock-lote/', actualizar_stock_lote, name='actualizar_stock_lote'),
 
@@ -35,5 +36,8 @@ urlpatterns = [
     path("prueba-pdf/", prueba_pdf, name="prueba_pdf"),
     path('facturas/pdf/<int:factura_id>/', factura_pdf, name='factura_pdf'),
     path('historial_ventas', historial_ventas, name='historial_ventas'),
+    path("facturas/<int:pk>/pdf/", factura_pdf_historial, name="factura_pdf"),
+    path("facturas/<int:factura_id>/eliminar/", eliminar_venta, name="eliminar_venta"),
+
 
 ]

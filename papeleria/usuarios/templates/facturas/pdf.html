@@ -1,14 +1,17 @@
 <style>
-  @page { size: 70mm 1000mm; margin: 0; }
+  @page { size: 80mm 297mm; margin: 0; }
+
   body {
     font-family: monospace;
-    font-size: 9px;
+    font-size: 11px; /* antes era 9px */
     padding: 5px;
-    line-height: 1.2;
+    line-height: 1.3; /* un poco más alto para que no se junten */
   }
+
   .center { text-align: center; }
   .right { text-align: right; }
   .linea { border-top: 1px dashed #000; margin: 4px 0; }
+
   table { width: 100%; border-collapse: collapse; }
   td { vertical-align: top; }
   td:nth-child(1) { width: 10%; }
@@ -16,23 +19,23 @@
   td:nth-child(3), td:nth-child(4) { width: 20%; text-align: right; }
 
   .bloque-cliente div {
-  margin: 0;
-  padding: 0;
-  line-height: 1; /* más pegado pero mantiene la fuente original */
-}
+    margin: 0;
+    padding: 0;
+    line-height: 1.2;
+  }
 
-.tabla-productos td {
-  padding: 0;
-  margin: 0;
-  line-height: 1; /* compacta filas */
-}
+  .tabla-productos td {
+    padding: 0;
+    margin: 0;
+    line-height: 1.2;
+  }
 
-.tabla-productos .descripcion {
-  max-width: 80px;  /* ajusta según el ancho de tu ticket */
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+  .tabla-productos .descripcion {
+    max-width: 80px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
 </style>
 
@@ -68,15 +71,29 @@ Factura Nº: 000-000-{{ factura.id|stringformat:"07d" }}
     <td>Precio</td>
     <td>Total</td>
   </tr>
-  {% for d in detalles %}
-  <tr>
-    <td>{{ d.cantidad }}</td>
-    <td class="descripcion">{{ d.producto.nombre }}</td>
-    <td>{{ d.precio }}</td>
-    <td>{{ d.subtotal }}</td>
-  </tr>
-  {% endfor %}
+
+  {# Si llega "detalles" úsalo; si no, usa la relación del modelo #}
+  {% if detalles %}
+    {% for d in detalles %}
+      <tr>
+        <td>{{ d.cantidad }}</td>
+        <td class="descripcion">{{ d.producto.nombre }}</td>
+        <td>{{ d.precio }}</td>
+        <td>{{ d.subtotal }}</td>
+      </tr>
+    {% endfor %}
+  {% else %}
+    {% for d in factura.detalles.all %}
+      <tr>
+        <td>{{ d.cantidad }}</td>
+        <td class="descripcion">{{ d.producto.nombre }}</td>
+        <td>{{ d.precio }}</td>
+        <td>{{ d.subtotal }}</td>
+      </tr>
+    {% endfor %}
+  {% endif %}
 </table>
+
 
 
 <div class="guiones">------------------------------------</div>

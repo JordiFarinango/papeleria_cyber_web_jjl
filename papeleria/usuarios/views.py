@@ -1,12 +1,19 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
-from .models import Marca, Categoria, Proveedor, Producto, Cliente, Factura, DetalleFactura, IngresoInventario
+from .models import Marca, Categoria, Proveedor, Producto, Cliente, Factura, DetalleFactura, IngresoInventario, Promocion
 from django.http import JsonResponse
 from django.template.loader import render_to_string
 from django.views.decorators.csrf import csrf_exempt
 import json
 from django.utils import timezone
+from datetime import datetime
+from django.db.models import F
+from django.db import transaction
+from django.http import HttpResponseNotAllowed
+
+from django.utils.dateparse import parse_datetime
+
 from decimal import Decimal
 
 from django.http import HttpResponse
@@ -39,9 +46,14 @@ def nuevo_producto_admin(request):
         marca = get_object_or_404(Marca, id=marca_id)
         categoria = get_object_or_404(Categoria, id=categoria_id)
 
+        if not nombre:
+            messages.error(request,"Error al guardar el producto.")
+            return redirect('nuevo_producto_admin')
+
         if nombre:
             guardar_producto = Producto(nombre=nombre, descripcion=descripcion, stock=stock, precio=precio, categoria=categoria, marca=marca, foto=foto)
             guardar_producto.save()
+            messages.success(request, "Producto guardado correctamente.")
             return redirect('nuevo_producto_admin')
         
     return render(request, 'paginas_administrador/agregar/nuevo_producto.html', {
@@ -58,6 +70,18 @@ def ver_productos_admin(request):
         'marcas': marcas,
         'productos': productos
     })
+
+def filtrar_productos_ver(request):
+    cat_id = request.GET.get("cat")
+    q = request.GET.get("q", "").strip()
+
+    productos = Producto.objects.all()
+    if cat_id:
+        productos = productos.filter(categoria_id=cat_id)
+    if q:
+        productos = productos.filter(nombre__icontains=q)
+
+    return render(request, "fragmentos/tabla_productos_ver.html", {"productos": productos})
 
 def eliminar_producto(request):
     producto_id = request.POST.get("id_producto")
@@ -91,6 +115,7 @@ def editar_producto(request):
         if foto:
             producto.foto = foto
         producto.save()
+        messages.info(request, "Producto Actualizado Correctamente.")
         return redirect('ver_productos_admin')
 
 
@@ -112,6 +137,7 @@ def marcas_admin(request):
         if nombre: #verifica si la variable en verdad tiene algun valor
             nueva_marca = Marca(nombre=nombre) #quiero crear una nueva marca con este nombre (primer 'nombre' es del modelo Marca de models, y el segundo 'nombre' es de la variable creada arriba)
             nueva_marca.save() #se guarda la marca en la base de datos
+            messages.success(request, "Marca guardado correctamente.")
             return redirect('marcas_admin') #cuando se guarde, redirigimos al usuarios a marcas.html
     return render(request, 'paginas_administrador/agregar/marcas.html',{
         'marcas': marcas
@@ -125,6 +151,7 @@ def editar_marcas(request):
         marca = get_object_or_404(Marca, id = marca_id)
         marca.nombre = nombre
         marca.save()
+        messages.info(request, "Marca actualizada con éxito.")
         return redirect ("marcas_admin")
 
 def categorias_admin(request):
@@ -135,6 +162,7 @@ def categorias_admin(request):
         if nombre:
             nueva_categoria = Categoria(nombre=nombre)
             nueva_categoria.save()
+            messages.success(request, "Categoria guardado correctamente.")
             return redirect('categorias_admin')
     return render(request, 'paginas_administrador/agregar/categorias.html',{
         'categorias':categorias
@@ -151,7 +179,7 @@ def editar_categoria(request):
     categoria = get_object_or_404(Categoria, id=categoria_id)
     categoria.nombre = nombre
     categoria.save()
-    messages.success(request, "Categoría actualizada correctamente.")
+    messages.info(request, "Categoría actualizada correctamente.")
     return redirect("categorias_admin")
 
 
@@ -166,6 +194,7 @@ def nuevo_proveedor_admin(request):
         if nombre and celular and cedula and direccion:
             nuevo_proveedor = Proveedor(nombre=nombre, celular=celular, ruc_cedula=cedula, direccion=direccion)
             nuevo_proveedor.save()
+            messages.success(request, "Proveedor guardado correctamente")
             return redirect('nuevo_proveedor_admin')
     return render (request, 'paginas_administrador/agregar/nuevo_proveedor.html',{
         'proveedores' : proveedores
@@ -175,6 +204,7 @@ def eliminar_proveedor(request):
     proveedor_id = request.POST.get("id_proveedor")
     proveedor = get_object_or_404(Proveedor, id=proveedor_id)
     proveedor.delete()
+    messages.warning(request, "Proveedor eliminado correctamente.")
     return redirect('nuevo_proveedor_admin')
 
 def editar_proveedor(request):
@@ -191,6 +221,7 @@ def editar_proveedor(request):
         proveedor.ruc_cedula = ruc_cedula
         proveedor.direccion = direccion
         proveedor.save()
+        messages.info(request,"Proveedor actualizado correctamente.")
         return redirect("nuevo_proveedor_admin")
    
 
@@ -217,6 +248,7 @@ def nuevo_cliente_admin(request):
         if nombre:
             nuevo_cliente = Cliente(nombre=nombre, ruc_cedula=cedula, direccion=direccion, correo=correo, celular=celular, provincia=provincia)
             nuevo_cliente.save()
+            messages.success(request, "Cliente guardado correctamente.")
             return redirect('nuevo_cliente_admin')
         
     return render(request, 'paginas_administrador/agregar/nuevo_cliente.html',{
@@ -246,32 +278,6 @@ def buscar_productos(request):
 
     html_filas = render_to_string('fragmentos/filas_productos.html', {'productos': productos})
     return JsonResponse({'html': html_filas})
-
-
-@csrf_exempt
-def confirmar_venta(request):
-    if request.method != 'POST':
-        return JsonResponse({'ok': False, 'error': 'Método no permitido'}, status=405)
-    try:
-        data = json.loads(request.body)
-        items = data.get('items', [])
-
-        for item in items:
-            producto_id = item['id']
-            cantidad = int(item['cantidad'])
-
-            # Buscar producto y restar stock
-            producto = Producto.objects.get(id=producto_id)
-            if producto.stock < cantidad:
-                return JsonResponse({'ok': False, 'error': f'Sin stock para {producto.nombre}'})
-            
-            producto.stock -= cantidad
-            producto.save()
-
-        return JsonResponse({'ok': True})
-    except Exception as e:
-        return JsonResponse({'ok': False, 'error': str(e)})
-        
 
 
 def filtrar_productos_por_categoria(request, categoria_id):
@@ -310,6 +316,7 @@ def eliminar_cliente(request):
     cliente_id = request.POST.get("cliente_id")
     cliente = get_object_or_404(Cliente, id=cliente_id)
     cliente.delete()
+    messages.warning(request,"Cliente eliminado correctamente.")
     return redirect("nuevo_cliente_admin")
 
 def editar_cliente(request):
@@ -330,6 +337,7 @@ def editar_cliente(request):
         cliente.correo = correo
         cliente.provincia = provincia
         cliente.save()
+        messages.info(request, "Cliente actualizado correctamente.")
 
         return redirect('nuevo_cliente_admin')
 
@@ -467,6 +475,8 @@ def confirmar_venta(request):
 
         factura.total = total
         factura.save()
+        messages.success(request, "Compra realizada con éxito.")
+
 
         return JsonResponse({'ok': True, 'factura_id': factura.id})
 
@@ -495,6 +505,7 @@ def actualizar_stock_lote(request):
             prod = Producto.objects.get(id=pid)
             prod.stock += cant
             prod.save()
+            
 
             # registrar ingreso
             IngresoInventario.objects.create(
@@ -505,14 +516,86 @@ def actualizar_stock_lote(request):
             actualizados.append({'id': prod.id, 'nuevo_stock': prod.stock})
 
         if not actualizados:
-            return JsonResponse({'exito': False, 'error': 'Nada válido para actualizar'})
+            messages.error(request, "Nada valido para actualizar")
+            return JsonResponse({'exito': False})
+        
+        messages.success(request, 'Stock actualizado correctamente.')
+        return JsonResponse({'exito': True})
 
-        return JsonResponse({'exito': True, 'actualizados': actualizados})
-    except Producto.DoesNotExist:
-        return JsonResponse({'exito': False, 'error': 'Producto no encontrado'})
-    except Exception as e:
-        return JsonResponse({'exito': False, 'error': str(e)})
+    except json.JSONDecodeError:
+        messages.error(request, 'Formato de datos inválido.')
+        return JsonResponse({'exito': False}, status=400)
+    except Exception:
+        messages.error(request, 'No se pudo actualizar el stock.')
+        return JsonResponse({'exito': False}, status=500)
 
 
 def historial_ventas(request):
-    return render(request, 'paginas_administrador/ver/historial_ventas.html')
+
+    facturas = Factura.objects.none()  # vacío por defecto
+    start = request.GET.get("start")
+    end = request.GET.get("end")
+    hoy_flag = request.GET.get("hoy")
+
+    if hoy_flag == "1":
+        hoy = timezone.localdate()  # respeta zona horaria
+        facturas = Factura.objects.filter(fecha__date=hoy).order_by("-id")
+    elif start or end:
+        # Parseo seguro
+        try:
+            start_d = datetime.strptime(start, "%Y-%m-%d").date() if start else None
+        except ValueError:
+            start_d = None
+        try:
+            end_d = datetime.strptime(end, "%Y-%m-%d").date() if end else None
+        except ValueError:
+            end_d = None
+
+        qs = Factura.objects.all()
+        if start_d:
+            qs = qs.filter(fecha__date__gte=start_d)
+        if end_d:
+            qs = qs.filter(fecha__date__lte=end_d)
+        facturas = qs.order_by("-id")
+
+    contexto = {
+        "facturas": facturas,
+        "start_value": start or "",
+        "end_value": end or "",
+        "aplico_filtro": (hoy_flag == "1") or bool(start or end),
+    }
+    return render(request, "paginas_administrador/ver/historial_ventas.html", contexto)
+
+def factura_pdf_historial(request, pk):
+    factura = get_object_or_404(
+        Factura.objects.select_related("cliente").prefetch_related("detalles__producto"),
+        pk=pk
+    )
+    contexto = {
+        "factura": factura,
+        "ahora": timezone.localtime(),  # por si quieres mostrar hora actual
+    }
+    return render(request, "facturas/pdf.html", contexto)
+
+@transaction.atomic
+def eliminar_venta(request, factura_id):
+    if request.method != "POST":
+        return HttpResponseNotAllowed(["POST"])
+
+    factura = get_object_or_404(
+        Factura.objects.prefetch_related("detalles__producto"),
+        id=factura_id
+    )
+
+    # 1) Revertir stock de cada producto
+    for det in factura.detalles.all():
+        # Usamos F() para evitar condiciones de carrera
+        Producto.objects.filter(id=det.producto_id).update(stock=F('stock') + det.cantidad)
+
+    # 2) Borrar la factura (cascade borra detalles)
+    factura.delete()
+    messages.success(request, "Venta eliminada y stock revertido correctamente.")
+    return redirect("historial_ventas")
+
+
+
