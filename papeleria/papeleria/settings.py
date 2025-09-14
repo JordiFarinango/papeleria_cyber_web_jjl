@@ -149,8 +149,18 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-if DEBUG: #es para verificar los correos
-    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+# ---- Email (Gmail SMTP) ----
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+# Aquí tu correo y la App Password de 16 caracteres
+EMAIL_HOST_USER = "erengod2002@gmail.com"
+EMAIL_HOST_PASSWORD = "visxmfnjxnlifuvt"
+
+# Remitente que verá el usuario
+DEFAULT_FROM_EMAIL = "Papelería Cyber Web J.J.L <erengod2002@gmail.com>"
 
 
 
